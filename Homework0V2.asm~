@@ -72,21 +72,47 @@ Homework0V2		proc
 				mov		num_3_hw, dx
 				mov		num_3_lw, ax
 
-				mov		ax, num_1_hw
-				call	PutHex
-				mov		ax, num_1_lw
-				call	PutHex
-
-				mov		ax, num_2_hw
-				call	PutHex
+				
+				mov		dx, num_1_lw
 				mov		ax, num_2_lw
+				mul		dx
+				mov		result_0, ax
+				mov		result_1, dx
+
+				mov		dx, num_1_hw
+				mov		ax, num_2_lw
+				mul		dx
+				clc
+				add		result_1, ax
+				adc 	result_2, dx
+
+				mov		dx, num_1_lw
+				mov		ax, num_2_hw
+				mul		dx
+				clc
+				add		result_1, ax
+				adc		result_2, dx
+				adc		result_3, 0
+
+				mov		dx, num_1_hw
+				mov		ax, num_1_hw
+				mul		dx
+				clc
+				add		result_2, ax
+				adc		result_3, dx
+
+				mov		ax, result_3
 				call	PutHex
 
-				mov		ax, num_3_hw
+				mov		ax, result_2
 				call	PutHex
-				mov		ax, num_3_lw
+
+				mov		ax, result_1
 				call	PutHex
-			
+
+				mov		ax, result_0
+				call	PutHex	
+					
 				mov		ah, 4ch
 				int 	21h
 Homework0V2		endp
