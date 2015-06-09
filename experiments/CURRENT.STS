@@ -1,0 +1,32 @@
+[shared-]
+	pmark=
+	version=3
+[debug-]
+	target="c:\dev\comput~1\experi~1\testst.exe"
+	synonym=;C:\DEV\COMPUT~1\EXPERI~1
+	srcwin=vs1+ /a+b+c+l+s+t+
+	srcwin=vs2+ /a+b+c+l+s+t-
+	memwin=vm2b 0x0A8A:0x00FE 
+[cv]
+	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
+	wndstate=1 80 9 0 1 0 0 0 0 0 0 0 0 0 -1
+	wndstate=2 34 9 33 1 0 0 0 0 0 0 0 0 0 -1
+	wndstate=3 68 20 0 1 0 1 0 0 0 5 0 0 0 -1
+	wndstate=4 68 20 0 20 0 1 0 0 0 0 0 0 0 -1
+	wndstate=5 67 9 0 22 0 0 0 0 0 0 0 0 0 -1
+	wndstate=6 68 20 0 20 1 1 0 20 0 22 20 0 0 -1
+	wndstate=7 13 39 67 1 0 1 0 0 0 0 0 0 0 -1
+	wndstate=8 67 9 0 31 0 0 0 0 0 0 0 0 0 -1
+	wndstate=9 80 10 0 39 0 1 0 1 0 2 0 0 0 -1
+	command=use auto
+	command=n10
+	screensize=50
+	command=oh+
+	command=ov+
+	command=oa+
+	command=oc+
+	command=of+
+	command=o3-
+	command=ollf   
+	tracespeed=250
+	callargs=1

@@ -37,7 +37,7 @@ divisor			dw	006c0h
 rem_result		dw	00000h
 
 .code
-				extern	GetDec : NEAR, PutUDec : NEAR, PutHex : NEAR
+				extern	GetDec : NEAR, PutDec : NEAR
 Homework0V2		proc
 				mov		ax, @data
 				mov		ds, ax
@@ -238,34 +238,22 @@ final_result_1_zero:
 
 AllDone:
 
-				mov		ax, final_result_3
-				call	PutHex
-				mov		ax, final_result_2
-				call	PutHex
-				mov		ax, final_result_1
-				call	PutHex
-				mov		ax, final_result_0
-				call	PutHex
+				mov		ax, offset final_result_0
+				call	PutGDec
 
 				mov		dx, offset put_cubic_inches
 				mov		ah, 9h
 				int		21h
 
-				mov		ax, div_result_3
-				call	PutHex
-				mov		ax, div_result_2
-				call	PutHex
-				mov		ax, div_result_1
-				call	PutHex
-				mov		ax, div_result_0
-				call	PutHex
+				mov		ax, offset div_result_0
+				call	PutGDec
 
 				mov		dx, offset put_cubic_feet
 				mov		ah, 9h
 				int		21h
 
 				mov		ax, rem_result
-				call	PutHex
+				call	PutDec
 
 				mov		dx, offset put_cubic_inches
 				mov		ah, 9h
@@ -275,4 +263,122 @@ AllDone:
 				int 	21h
 
 Homework0V2		endp
+
+;This will output a giant decimal number in 8086 instruction set
+PutGDec			proc
+				
+				;Preconditions: The offset of the low word of the number
+				;to be displayed is in Ax
+
+				push	bx
+				push	cx
+				push	dx
+				
+				mov		di, ax
+				mov		bx, 0Ah
+
+				xor		ax, ax
+				xor		dx, dx
+
+				push	'$'
+
+				add		di, 6
+				mov		ax, [di]			;ax now contains the high word
+				cmp		ax, 0
+				ja		StartDivide3
+				
+				sub		di, 2
+				mov		ax, [di]
+				cmp		ax, 0
+				ja		StartDivide2
+				
+				sub		di, 2
+				mov		ax, [di]
+				cmp		ax, 0
+				ja		StartDivide1
+				
+				sub		di, 2
+				mov		ax, [di]
+				cmp		ax, 0
+				ja		StartDivide0
+				
+				push	'0'
+				jmp		Done
+				
+StartDivide3:
+				cmp		ax, bx
+				jb		SetupDivide2
+
+				div		bx
+
+				add		dx, '0'
+				push	dx
+				xor		dx, dx
+
+				jmp		StartDivide3
+
+SetupDivide2:
+				mov		dx, ax
+				sub		di, 2
+				mov		ax, [di]
+StartDivide2:
+				cmp		ax, bx
+				jb		SetupDivide1
+
+				div		bx
+				
+				add		dx, '0'
+				push	dx
+				xor		dx, dx
+
+				jmp 	StartDivide2
+SetupDivide1:
+				mov		dx, ax
+				sub		di, 2
+				mov		ax, [di]
+StartDivide1:
+				cmp		ax, bx
+				jb		SetupDivide0
+
+				div		bx
+
+				add		dx, '0'
+				push	dx
+				xor		dx, dx
+
+				jmp		StartDivide1
+SetupDivide0:
+				mov		dx, ax
+				sub		di, 2
+				mov		ax, [di]
+StartDivide0:
+				cmp		ax, bx
+				jb		AlmostDone
+
+				div		bx
+
+				add		dx, '0'
+				push	dx
+				xor		dx, dx
+
+				jmp		StartDivide0
+AlmostDone:
+				add		ax, '0'
+				push	ax
+Done:
+				pop		dx
+				cmp		dx, '$'
+				je		TotallyDone
+				
+				mov		ah, 02h
+				int		21h
+				jmp		Done
+TotallyDone:
+				pop		dx
+				pop		cx
+				pop		bx
+
+				ret
+
+PutGDec			endp
 				end Homework0V2
