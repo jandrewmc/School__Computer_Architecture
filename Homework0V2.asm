@@ -32,6 +32,11 @@ div_result_1	dw	00000h
 div_result_2	dw	00000h
 div_result_3	dw	00000h
 
+conv_res_0	dw	0
+conv_res_1	dw	0
+conv_res_2	dw	0
+conf_res_3	dw	0
+
 divisor			dw	006c0h
 
 rem_result		dw	00000h
@@ -279,26 +284,30 @@ PutGDec			proc
 
 				xor		ax, ax
 				xor		dx, dx
-
+				
+				mov		conv_res_0, [di]
+				add		di, 2
+				mov		conv_res_1, [di]
+				add		di, 2
+				mov		conv_res_2, [di]
+				add		di, 2
+				mov		conv_res_3, [di]
+				
 				push	'$'
 
-				add		di, 6
-				mov		ax, [di]			;ax now contains the high word
+				mov		ax, conv_res_3
 				cmp		ax, 0
 				ja		StartDivide3
 				
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_2
 				cmp		ax, 0
 				ja		StartDivide2
 				
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_1
 				cmp		ax, 0
 				ja		StartDivide1
 				
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_0
 				cmp		ax, 0
 				ja		StartDivide0
 				
@@ -310,43 +319,36 @@ StartDivide3:
 				jb		SetupDivide2
 
 				div		bx
-
-				add		dx, '0'
-				push	dx
-				xor		dx, dx
-
-				jmp		StartDivide3
+				push		dx
+				
+				mov		conv_res_3, ax
 
 SetupDivide2:
 				mov		dx, ax
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_2
 StartDivide2:
+				cmp		dx, 0
+				ja		SkipDiv2Check
 				cmp		ax, bx
 				jb		SetupDivide1
-
+SkipDiv2Check:
 				div		bx
+				push		dx
 				
-				add		dx, '0'
-				push	dx
-				xor		dx, dx
-
-				jmp 	StartDivide2
+				mov		conv_res_2, ax
 SetupDivide1:
 				mov		dx, ax
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_1
 StartDivide1:
+				cmp		dx, ax
+				ja		SkipDev1Check
 				cmp		ax, bx
 				jb		SetupDivide0
-
+SkipDiv1Check:
 				div		bx
-
-				add		dx, '0'
-				push	dx
-				xor		dx, dx
-
-				jmp		StartDivide1
+				push		dx
+				
+				mov		conv_res_1, ax
 SetupDivide0:
 				mov		dx, ax
 				sub		di, 2
