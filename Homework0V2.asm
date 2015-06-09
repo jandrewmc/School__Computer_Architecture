@@ -35,7 +35,7 @@ div_result_3	dw	00000h
 conv_res_0	dw	0
 conv_res_1	dw	0
 conv_res_2	dw	0
-conf_res_3	dw	0
+conv_res_3	dw	0
 
 divisor			dw	006c0h
 
