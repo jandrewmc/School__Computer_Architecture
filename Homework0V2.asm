@@ -1,5 +1,5 @@
 .model	small
-.386
+.8086
 .stack	100h
 .data
 
@@ -283,6 +283,7 @@ PutGDec			proc
 				mov		bx, 0Ah
 
 				xor		ax, ax
+				xor		cx, cx
 				xor		dx, dx
 				
 				mov		conv_res_0, [di]
@@ -294,7 +295,7 @@ PutGDec			proc
 				mov		conv_res_3, [di]
 				
 				push	'$'
-
+StartProcess:
 				mov		ax, conv_res_3
 				cmp		ax, 0
 				ja		StartDivide3
@@ -319,9 +320,8 @@ StartDivide3:
 				jb		SetupDivide2
 
 				div		bx
-				push		dx
 				
-				mov		conv_res_3, ax
+				mov		conv_res_3, dx
 
 SetupDivide2:
 				mov		dx, ax
@@ -333,9 +333,8 @@ StartDivide2:
 				jb		SetupDivide1
 SkipDiv2Check:
 				div		bx
-				push		dx
 				
-				mov		conv_res_2, ax
+				mov		conv_res_2, dx
 SetupDivide1:
 				mov		dx, ax
 				mov		ax, conv_res_1
@@ -346,27 +345,24 @@ StartDivide1:
 				jb		SetupDivide0
 SkipDiv1Check:
 				div		bx
-				push		dx
 				
-				mov		conv_res_1, ax
+				mov		conv_res_1, dx
 SetupDivide0:
 				mov		dx, ax
-				sub		di, 2
-				mov		ax, [di]
+				mov		ax, conv_res_0
 StartDivide0:
+				cmp		dx, ax
+				ja		SkipDev0Check
 				cmp		ax, bx
 				jb		AlmostDone
-
+SkipDev0Check:
 				div		bx
 
-				add		dx, '0'
-				push	dx
-				xor		dx, dx
-
-				jmp		StartDivide0
+				mov		conv_res_0, dx
 AlmostDone:
 				add		ax, '0'
-				push	ax
+				push		ax
+				jmp		StartProcess
 Done:
 				pop		dx
 				cmp		dx, '$'
