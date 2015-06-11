@@ -9,13 +9,13 @@
 .data
 
 tutorial		db	10, 'Volume Calculation', 13, 10
-				db	'Enter the length, width, and height', 13, 10
-				db	'in feet and inches to calculate the', 13, 10
-				db	'volume of the rectangular prism.', 13, 10
-				db	'Example Input:', 13, 10, 10
-				db	'length in feet and inches: x y', 13, 10, 10
-				db	'where x is the number of feet', 13, 10
-				db	'and y is the number of inches', 13, 10, 10, '$'
+			db	'Enter the length, width, and height', 13, 10
+			db	'in feet and inches to calculate the', 13, 10
+			db	'volume of the rectangular prism.', 13, 10
+			db	'Example Input:', 13, 10, 10
+			db	'length in feet and inches: x y', 13, 10, 10
+			db	'where x is the number of feet', 13, 10
+			db	'and y is the number of inches', 13, 10, 10, '$'
 
 
 get_length		db	'length in feet and inches: $'
@@ -62,33 +62,33 @@ Homework0V2		proc
 				mov		ax, @data
 				mov		ds, ax
 
-				mov		dx, offset tutorial			;print tutorial
+				mov		dx, offset tutorial		;print tutorial
 				mov		ah, 9h
 				int		21h
 
 				mov		dx, offset get_length		
 				mov		ah, 9h
 				int		21h
-				call	GetDec
-				mov		bx, 12						;inches from feet =
-													;feet * 12
+				call		GetDec
+				mov		bx, 12				;inches from feet =
+										;feet * 12
 				mul		bx
 				mov		bx, ax
-				call	GetDec
+				call		GetDec
 				clc
 				add		ax, bx
-				adc		dx, 0						;result inches = 
-				mov		num_1_hw, dx				;inches from feet + 
-				mov		num_1_lw, ax				;input inches
+				adc		dx, 0				;result inches = 
+				mov		num_1_hw, dx			;inches from feet + 
+				mov		num_1_lw, ax			;input inches
 
 				mov		dx, offset get_width
 				mov		ah, 9h
 				int		21h
-				call	GetDec
+				call		GetDec
 				mov		bx, 12
 				mul		bx
 				mov		bx, ax
-				call	GetDec
+				call		GetDec
 				clc
 				add		ax, bx
 				adc		dx, 0
@@ -98,11 +98,11 @@ Homework0V2		proc
 				mov		dx, offset get_height
 				mov		ah, 9h
 				int		21h
-				call	GetDec
+				call		GetDec
 				mov		bx, 12
 				mul		bx
 				mov		bx, ax
-				call	GetDec
+				call		GetDec
 				clc
 				add		ax, bx
 				adc		dx, 0
@@ -124,7 +124,7 @@ Homework0V2		proc
 				mul		dx
 				clc
 				add		result_1, ax
-				adc 	result_2, dx
+				adc 		result_2, dx
 
 				mov		dx, num_1_lw
 				mov		ax, num_2_hw
@@ -271,28 +271,28 @@ final_result_1_zero:
 AllDone:
 
 				mov		ax, offset final_result_0
-				call	PutGDec
+				call		PutGDec
 
 				mov		dx, offset put_cubic_inches
 				mov		ah, 9h
 				int		21h
 
 				mov		ax, offset div_result_0
-				call	PutGDec
+				call		PutGDec
 
 				mov		dx, offset put_cubic_feet
 				mov		ah, 9h
 				int		21h
 
 				mov		ax, rem_result
-				call	PutDec
+				call		PutDec
 
 				mov		dx, offset put_cubic_inches
 				mov		ah, 9h
 				int		21h
 
 				mov		ah, 4ch
-				int 	21h
+				int 		21h
 
 Homework0V2		endp
 
@@ -302,9 +302,9 @@ PutGDec			proc
 ;Preconditions: The offset of the low word of the number
 ;to be displayed is in Ax
 
-				push	bx
-				push	cx
-				push	dx
+				push		bx
+				push		cx
+				push		dx
 				
 				mov		di, ax
 				mov		bx, 0Ah
@@ -314,9 +314,9 @@ PutGDec			proc
 				xor		dx, dx
 				
 				mov		ax, '$'	
-				push	ax
+				push	 	ax
 								
-				mov		ax, [di]			;move the word output
+				mov		ax, [di]		;move the word output
 				mov		conv_res_0, ax		;to new variable
 				add		di, 2
 				mov		ax, [di]
@@ -338,12 +338,12 @@ PutGDec			proc
 				jne		StartProcess
 
 				mov		ax, '0'
-				push	ax
+				push		ax
 				jmp		Done
 
 StartProcess:
 				mov		ax, conv_res_3		;figure out the first non
-				cmp		ax, 0				;zero word in the number and
+				cmp		ax, 0			;zero word in the number and
 				ja		StartDivide3		;start there
 				
 				mov		ax, conv_res_2
@@ -358,7 +358,7 @@ StartProcess:
 				cmp		ax, 0
 				ja		StartDivide0
 				
-				jmp		Done				;once the word is zero, done
+				jmp		Done			;once the word is zero, done
 				
 StartDivide3:
 				div		bx
@@ -376,20 +376,20 @@ StartDivide0:
 				div		bx
 				mov		conv_res_0, ax
 AlmostDone:
-				add		dx, '0'				;convert remainder to char and
-				push	dx					;place on the stack (lsb of
-				xor		dx, dx				;number to be displayed)
+				add		dx, '0'			;convert remainder to char and
+				push		dx			;place on the stack (lsb of
+				xor		dx, dx			;number to be displayed)
 				jmp		StartProcess		;do it again
 Done:
-				pop		dx					;the bottom number on the stack
-				cmp		dx, '$'				;is the msb of the output
-				je		TotallyDone			;pop and print until the $ is 
-											;reached
+				pop		dx			;the bottom number on the stack
+				cmp		dx, '$'			;is the msb of the output
+				je		TotallyDone		;pop and print until the $ is 
+									;reached
 				mov		ah, 02h
 				int		21h
 				jmp		Done
 TotallyDone:
-				pop		dx					;restore registers
+				pop		dx			;restore registers
 				pop		cx
 				pop		bx
 
