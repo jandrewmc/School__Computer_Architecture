@@ -25,34 +25,34 @@ get_height		db	'height in feet and inches: $'
 put_cubic_inches	db	' cu. in.', 13, 10, '$'
 put_cubic_feet		db	' cu. ft. $' 
 
-num_1_lw		dw	0
+num_1_lw		dw	0		;input numbers
 num_1_hw		dw	0
 num_2_lw		dw	0
 num_2_hw		dw	0
 num_3_lw		dw	0
 num_3_hw		dw	0
 
-result_0		dw	0
+result_0		dw	0		
 result_1		dw	0
 result_2		dw	0
 result_3		dw	0
 
-final_result_0	dw	0
+final_result_0	dw	0		;final multiplication result
 final_result_1	dw	0
 final_result_2	dw	0
 final_result_3	dw	0
 
-div_result_0	dw	0
+div_result_0	dw	0		;final division by divisor result
 div_result_1	dw	0
 div_result_2	dw	0
 div_result_3	dw	0
 
-conv_res_0		dw	0
+conv_res_0		dw	0		;used in PutGDec (Put Giant Decimal)
 conv_res_1		dw	0
 conv_res_2		dw	0
 conv_res_3		dw	0
 
-divisor			dw	006c0h
+divisor			dw	006c0h		;divide by 12 * 12 * 12 for cubit feet
 
 rem_result		dw	0
 
@@ -66,19 +66,20 @@ Homework0V2		proc
 				mov		ah, 9h
 				int		21h
 
-				mov		dx, offset get_length
+				mov		dx, offset get_length		
 				mov		ah, 9h
 				int		21h
 				call	GetDec
-				mov		bx, 12
+				mov		bx, 12						;inches from feet =
+													;feet * 12
 				mul		bx
 				mov		bx, ax
 				call	GetDec
 				clc
 				add		ax, bx
-				adc		dx, 0
-				mov		num_1_hw, dx
-				mov		num_1_lw, ax
+				adc		dx, 0						;result inches = 
+				mov		num_1_hw, dx				;inches from feet + 
+				mov		num_1_lw, ax				;input inches
 
 				mov		dx, offset get_width
 				mov		ah, 9h
@@ -109,6 +110,9 @@ Homework0V2		proc
 				mov		num_3_lw, ax
 
 				
+;This section is simple but hard to follow,
+;This is basic multiplication but done word-wise.
+
 				mov		dx, num_1_lw
 				mov		ax, num_2_lw
 				mul		dx
@@ -176,10 +180,11 @@ Homework0V2		proc
 				mul		dx
 				add		final_result_3, ax
 
+				
+;same thing as above, except this is word-wise division
+
 				mov		bx, divisor
 				xor		dx, dx
-
-
 
 				cmp		final_result_3, 0
 				jz		final_result_3_zero
@@ -206,8 +211,6 @@ Homework0V2		proc
 				mov		div_result_0, ax
 				mov		rem_result, dx	
 				
-				
-
 				jmp		AllDone
 
 final_result_3_zero:
@@ -293,11 +296,11 @@ AllDone:
 
 Homework0V2		endp
 
-;This will output a giant decimal number in 8086 instruction set
+;This will output a quad word decimal number in 8086 instruction set
 PutGDec			proc
 				
-				;Preconditions: The offset of the low word of the number
-				;to be displayed is in Ax
+;Preconditions: The offset of the low word of the number
+;to be displayed is in Ax
 
 				push	bx
 				push	cx
@@ -312,9 +315,9 @@ PutGDec			proc
 				
 				mov		ax, '$'	
 				push	ax
-
-				mov		ax, [di]
-				mov		conv_res_0, ax
+								
+				mov		ax, [di]			;move the word output
+				mov		conv_res_0, ax		;to new variable
 				add		di, 2
 				mov		ax, [di]
 				mov		conv_res_1, ax
@@ -325,9 +328,9 @@ PutGDec			proc
 				mov		ax, [di]
 				mov		conv_res_3, ax
 				
-				cmp		conv_res_0, 0
-				jne		StartProcess
-				cmp		conv_res_1, 0
+				cmp		conv_res_0, 0		;if the number to be
+				jne		StartProcess		;output is zero, 
+				cmp		conv_res_1, 0		;push a zero onto the stack
 				jne		StartProcess
 				cmp		conv_res_2, 0
 				jne		StartProcess
@@ -339,9 +342,9 @@ PutGDec			proc
 				jmp		Done
 
 StartProcess:
-				mov		ax, conv_res_3
-				cmp		ax, 0
-				ja		StartDivide3
+				mov		ax, conv_res_3		;figure out the first non
+				cmp		ax, 0				;zero word in the number and
+				ja		StartDivide3		;start there
 				
 				mov		ax, conv_res_2
 				cmp		ax, 0
@@ -355,45 +358,38 @@ StartProcess:
 				cmp		ax, 0
 				ja		StartDivide0
 				
-				jmp		Done
+				jmp		Done				;once the word is zero, done
 				
 StartDivide3:
 				div		bx
-				
-				mov		conv_res_3, ax
-
-				mov		ax, conv_res_2
-StartDivide2:
+				mov		conv_res_3, ax		;ax becomes is a member of the
+				mov		ax, conv_res_2		;loop, dx is high word for 
+StartDivide2:								;next division
 				div		bx
-				
 				mov		conv_res_2, ax
-
 				mov		ax, conv_res_1
 StartDivide1:
 				div		bx
-				
 				mov		conv_res_1, ax
-
 				mov		ax, conv_res_0
 StartDivide0:
 				div		bx
-
 				mov		conv_res_0, ax
 AlmostDone:
-				add		dx, '0'
-				push	dx
-				xor		dx, dx
-				jmp		StartProcess
+				add		dx, '0'				;convert remainder to char and
+				push	dx					;place on the stack (lsb of
+				xor		dx, dx				;number to be displayed)
+				jmp		StartProcess		;do it again
 Done:
-				pop		dx
-				cmp		dx, '$'
-				je		TotallyDone
-				
+				pop		dx					;the bottom number on the stack
+				cmp		dx, '$'				;is the msb of the output
+				je		TotallyDone			;pop and print until the $ is 
+											;reached
 				mov		ah, 02h
 				int		21h
 				jmp		Done
 TotallyDone:
-				pop		dx
+				pop		dx					;restore registers
 				pop		cx
 				pop		bx
 
