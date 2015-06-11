@@ -24,7 +24,7 @@ seconds_out		db ' seconds: $'
 new_line		db 13, 10, '$'
 
 .code
-	extern	GetDec : NEAR, PutHex : NEAR
+	extern	GetDec : NEAR, Puthex : NEAR
 
 Project1		proc
 
@@ -195,4 +195,74 @@ Project1		proc
 			int		21h
 
 Project1		endp
+PutDDec16bit	proc
+	
+;Preconditions: DX:AX is the double word you want to print
+
+			push	bx
+			push	cx
+
+			mov		bx, '$'
+			push	bx
+
+			mov		bx, 0Ah
+
+			cmp		dx, 0
+			jne		StartProcess
+			cmp		ax, 0
+			jne		StartProcess
+
+			mov		ax, '0'
+			push	ax
+			jmp		Done
+
+StartProcess:
+
+			cmp		dx, 0
+			ja		start_div_hw
+
+			cmp		ax, 0
+			ja		start_div_lw
+
+			jmp		Done
+
+start_div_hw:
+			
+			mov		cx, ax
+			mov		ax, dx
+			xor		dx, dx
+			div		bx
+			mov		di, ax
+			mov		ax, cx
+
+start_div_lw:
+
+			div		bx
+			mov		si, ax
+
+			add		dx, '0'
+			push	dx
+			mov		dx, di
+			mov		ax, si
+			jmp		StartProcess
+
+Done:
+
+			pop		dx
+			cmp		dx, '$'
+			je		TotallyDone
+
+			mov		ah, 02h
+			int		21h
+			jmp		Done
+
+TotallyDone:
+
+			pop		cx
+			pop		bx
+
+
+			ret
+PutDDec16bit	endp
+
 			end	Project1

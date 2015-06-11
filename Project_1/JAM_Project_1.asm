@@ -24,7 +24,7 @@ seconds_out		db ' seconds: $'
 new_line		db 13, 10, '$'
 
 .code
-	extern	GetDec : NEAR, PutDec : NEAR
+	extern	GetDec : NEAR, Puthex : NEAR, PutDec : NEAR
 
 Project1		proc
 
@@ -90,7 +90,7 @@ Project1		proc
 
 			pop		cx
 			mov		ax, cx
-			call	puthex
+			call	putdec
 
 			
 			mov		dx, offset seconds_out
@@ -99,7 +99,7 @@ Project1		proc
 
 			pop		bx
 			mov		ax, bx
-			call	puthex
+			call	putdec
 
 			mov		dx, offset new_line
 			mov		ah, 9h
@@ -148,7 +148,7 @@ Project1		proc
 
 			pop		cx
 			mov		ax, cx
-			call	puthex
+			call	putdec
 
 			mov		dx, offset new_line
 			mov		ah, 9h
@@ -202,7 +202,7 @@ PutDDec16bit	proc
 			push	bx
 			push	cx
 
-			mov		bx, '$"
+			mov		bx, '$'
 			push	bx
 
 			mov		bx, 0Ah
@@ -235,7 +235,7 @@ start_div_hw:
 			mov		di, ax
 			mov		ax, cx
 
-start_div_lw
+start_div_lw:
 
 			div		bx
 			mov		si, ax
