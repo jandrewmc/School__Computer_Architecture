@@ -1,7 +1,22 @@
+;J Andrew McCormick
+;Computer Architecture and Orgainzation
+;Summer 2015
+
+
 .model	small
 .8086
 .stack	100h
 .data
+
+tutorial		db	10, 'Volume Calculation', 13, 10
+				db	'Enter the length, width, and height', 13, 10
+				db	'in feet and inches to calculate the', 13, 10
+				db	'volume of the rectangular prism.', 13, 10
+				db	'Example Input:', 13, 10, 10
+				db	'length in feet and inches: x y', 13, 10, 10
+				db	'where x is the number of feet', 13, 10
+				db	'and y is the number of inches', 13, 10, 10, '$'
+
 
 get_length		db	'length in feet and inches: $'
 get_width		db	'width in feet and inches: $'
@@ -10,42 +25,46 @@ get_height		db	'height in feet and inches: $'
 put_cubic_inches	db	' cu. in.', 13, 10, '$'
 put_cubic_feet		db	' cu. ft. $' 
 
-num_1_lw		dw	00000h
-num_1_hw		dw	00000h
-num_2_lw		dw	00000h
-num_2_hw		dw	00000h
-num_3_lw		dw	00000h
-num_3_hw		dw	00000h
+num_1_lw		dw	0
+num_1_hw		dw	0
+num_2_lw		dw	0
+num_2_hw		dw	0
+num_3_lw		dw	0
+num_3_hw		dw	0
 
-result_0		dw	00000h
-result_1		dw	00000h
-result_2		dw	00000h
-result_3		dw	00000h
+result_0		dw	0
+result_1		dw	0
+result_2		dw	0
+result_3		dw	0
 
-final_result_0	dw	00000h
-final_result_1	dw	00000h
-final_result_2	dw	00000h
-final_result_3	dw	00000h
+final_result_0	dw	0
+final_result_1	dw	0
+final_result_2	dw	0
+final_result_3	dw	0
 
-div_result_0	dw	00000h
-div_result_1	dw	00000h
-div_result_2	dw	00000h
-div_result_3	dw	00000h
+div_result_0	dw	0
+div_result_1	dw	0
+div_result_2	dw	0
+div_result_3	dw	0
 
-conv_res_0	dw	0
-conv_res_1	dw	0
-conv_res_2	dw	0
-conv_res_3	dw	0
+conv_res_0		dw	0
+conv_res_1		dw	0
+conv_res_2		dw	0
+conv_res_3		dw	0
 
 divisor			dw	006c0h
 
-rem_result		dw	00000h
+rem_result		dw	0
 
 .code
 				extern	GetDec : NEAR, PutDec : NEAR
 Homework0V2		proc
 				mov		ax, @data
 				mov		ds, ax
+
+				mov		dx, offset tutorial			;print tutorial
+				mov		ah, 9h
+				int		21h
 
 				mov		dx, offset get_length
 				mov		ah, 9h
@@ -187,9 +206,12 @@ Homework0V2		proc
 				mov		div_result_0, ax
 				mov		rem_result, dx	
 				
+				
+
 				jmp		AllDone
 
 final_result_3_zero:
+
 				cmp		final_result_2, 0
 				jz		final_result_2_zero
 				
@@ -213,6 +235,7 @@ final_result_3_zero:
 				jmp		AllDone
 
 final_result_2_zero:
+
 				cmp		final_result_1, 0
 				jz		final_result_1_zero
 
@@ -232,6 +255,7 @@ final_result_2_zero:
 
 
 final_result_1_zero:
+
 				mov		ax, final_result_0
 
 				div		bx
@@ -300,6 +324,20 @@ PutGDec			proc
 				add		di, 2
 				mov		ax, [di]
 				mov		conv_res_3, ax
+				
+				cmp		conv_res_0, 0
+				jne		StartProcess
+				cmp		conv_res_1, 0
+				jne		StartProcess
+				cmp		conv_res_2, 0
+				jne		StartProcess
+				cmp		conv_res_3, 0
+				jne		StartProcess
+
+				mov		ax, '0'
+				push	ax
+				jmp		Done
+
 StartProcess:
 				mov		ax, conv_res_3
 				cmp		ax, 0
@@ -324,19 +362,18 @@ StartDivide3:
 				
 				mov		conv_res_3, ax
 
-SetupDivide2:
 				mov		ax, conv_res_2
 StartDivide2:
 				div		bx
 				
 				mov		conv_res_2, ax
-SetupDivide1:
+
 				mov		ax, conv_res_1
 StartDivide1:
 				div		bx
 				
 				mov		conv_res_1, ax
-SetupDivide0:
+
 				mov		ax, conv_res_0
 StartDivide0:
 				div		bx
