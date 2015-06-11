@@ -2,19 +2,19 @@
 	pmark=
 	version=3
 [debug-]
-	target="c:\dev\comput~1\home3.exe"
+	target="c:\dev\comput~1\home2.exe"
 	synonym=;C:\DEV\COMPUT~1
 	srcwin=vs1+ /a+b+c+l+s+t+
-	memwin=vm1b 0x0A07:0x00F4 
+	memwin=vm1b DS:0 
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
 	wndstate=1 80 8 0 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=2 34 8 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 80 25 0 9 0 1 0 0 0 9 0 0 0 -1
+	wndstate=3 80 25 0 9 0 1 0 0 0 286 275 0 0 -1
 	wndstate=4 67 9 3 12 0 0 0 0 0 0 0 0 0 -1
-	wndstate=5 67 8 0 34 1 1 0 58 0 20 19 0 0 -1
+	wndstate=5 67 8 0 34 0 1 0 0 0 0 0 0 0 -1
 	wndstate=6 67 8 3 21 0 0 0 0 0 0 0 0 0 -1
-	wndstate=7 13 41 67 1 0 1 0 0 0 0 0 0 0 -1
+	wndstate=7 13 41 67 1 1 1 0 0 0 0 0 0 0 -1
 	wndstate=8 67 8 0 26 0 0 0 0 0 0 0 0 0 -1
 	wndstate=9 80 8 0 34 0 1 0 1 0 1 0 0 0 -1
 	command=use auto

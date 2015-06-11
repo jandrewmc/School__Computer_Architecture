@@ -8,7 +8,7 @@ get_width		db	'width in feet and inches: $'
 get_height		db	'height in feet and inches: $'
 
 put_cubic_inches	db	' cu. in.', 13, 10, '$'
-put_cubic_feet	db	' cu. ft.$' 
+put_cubic_feet		db	' cu. ft. $' 
 
 num_1_lw		dw	00000h
 num_1_hw		dw	00000h
@@ -75,7 +75,7 @@ Homework0V2		proc
 				mov		num_2_hw, dx
 				mov		num_2_lw, ax
 
-				mov		dx, offset get_width
+				mov		dx, offset get_height
 				mov		ah, 9h
 				int		21h
 				call	GetDec
@@ -286,15 +286,20 @@ PutGDec			proc
 				xor		cx, cx
 				xor		dx, dx
 				
-				mov		conv_res_0, [di]
+				mov		ax, '$'	
+				push	ax
+
+				mov		ax, [di]
+				mov		conv_res_0, ax
 				add		di, 2
-				mov		conv_res_1, [di]
+				mov		ax, [di]
+				mov		conv_res_1, ax
 				add		di, 2
-				mov		conv_res_2, [di]
+				mov		ax, [di]
+				mov		conv_res_2, ax
 				add		di, 2
-				mov		conv_res_3, [di]
-				
-				push	'$'
+				mov		ax, [di]
+				mov		conv_res_3, ax
 StartProcess:
 				mov		ax, conv_res_3
 				cmp		ax, 0
@@ -312,56 +317,35 @@ StartProcess:
 				cmp		ax, 0
 				ja		StartDivide0
 				
-				push	'0'
 				jmp		Done
 				
 StartDivide3:
-				cmp		ax, bx
-				jb		SetupDivide2
-
 				div		bx
 				
-				mov		conv_res_3, dx
+				mov		conv_res_3, ax
 
 SetupDivide2:
-				mov		dx, ax
 				mov		ax, conv_res_2
 StartDivide2:
-				cmp		dx, 0
-				ja		SkipDiv2Check
-				cmp		ax, bx
-				jb		SetupDivide1
-SkipDiv2Check:
 				div		bx
 				
-				mov		conv_res_2, dx
+				mov		conv_res_2, ax
 SetupDivide1:
-				mov		dx, ax
 				mov		ax, conv_res_1
 StartDivide1:
-				cmp		dx, ax
-				ja		SkipDev1Check
-				cmp		ax, bx
-				jb		SetupDivide0
-SkipDiv1Check:
 				div		bx
 				
-				mov		conv_res_1, dx
+				mov		conv_res_1, ax
 SetupDivide0:
-				mov		dx, ax
 				mov		ax, conv_res_0
 StartDivide0:
-				cmp		dx, ax
-				ja		SkipDev0Check
-				cmp		ax, bx
-				jb		AlmostDone
-SkipDev0Check:
 				div		bx
 
-				mov		conv_res_0, dx
+				mov		conv_res_0, ax
 AlmostDone:
-				add		ax, '0'
-				push		ax
+				add		dx, '0'
+				push	dx
+				xor		dx, dx
 				jmp		StartProcess
 Done:
 				pop		dx
