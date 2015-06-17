@@ -5,16 +5,16 @@
 	target="c:\dev\comput~1\projec~2\proj1.exe"
 	synonym=;C:\DEV\COMPUT~1\PROJEC~2
 	srcwin=vs1+ /a+b+c+l+s+t+
-	memwin=vm1b 0x0A1C:0x00F1 
+	memwin=vm1b 0x0A36:0x00F8 
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
-	wndstate=1 80 9 0 1 0 1 0 0 0 0 0 0 0 -1
+	wndstate=1 80 9 0 1 1 1 0 0 0 0 0 0 0 -1
 	wndstate=2 34 9 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 80 30 0 10 0 1 0 0 0 25 0 0 0 -1
+	wndstate=3 80 30 0 10 0 1 0 0 0 124 124 0 0 -1
 	wndstate=4 67 12 3 13 0 0 0 0 0 0 0 0 0 -1
-	wndstate=5 67 9 0 41 0 1 0 0 0 19 19 0 0 -1
+	wndstate=5 67 9 0 41 0 1 0 0 0 20 20 0 0 -1
 	wndstate=6 67 9 3 25 0 0 0 0 0 0 0 0 0 -1
-	wndstate=7 13 48 67 1 1 1 0 0 0 0 0 0 0 -1
+	wndstate=7 13 48 67 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=8 67 9 0 31 0 0 0 0 0 0 0 0 0 -1
 	wndstate=9 80 9 0 40 0 1 0 1 0 1 0 0 0 -1
 	command=use auto

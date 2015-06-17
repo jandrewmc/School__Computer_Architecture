@@ -1,0 +1,27 @@
+.model small
+.8086
+.stack 100h
+.data
+.code
+	extern Puthex : NEAR
+testStack	proc
+			mov		ax, @data
+			mov		ds, ax
+
+			mov		ax, 01234h
+			mov		bx, 05678h
+			mov		cx, 09abch
+			mov		dx, 0def0h
+
+			call	puthex
+			mov		ax, bx
+			call	puthex
+			mov		ax, cx
+			call	puthex
+			mov		ax, dx
+			call	puthex
+
+			mov		ah, 9h
+			int		21h
+teststack	endp
+			end teststack
