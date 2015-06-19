@@ -208,10 +208,11 @@ f1_next_char:
 	je		f1_done
 	
 	inc		bx
-	inc		cx
 	
 	cmp		cx, input_string_length
 	je		not_in_string
+
+	inc		cx
 
 	jmp		f1_next_char
 not_in_string:
@@ -276,9 +277,60 @@ Function_2 proc
 
 	mov		ah, 01h
 	int		21h
+	
+	mov		cx, input_string_length
+	mov		bx, offset input_string 
+	xor		si, si
 
+f2_start:
+
+	mov		dx, [bx]
+	cmp		al, dl
+	jne		f2_cont
+	inc		si
+
+f2_cont:
+	inc		bx
+	dec		cx
+	jnz		f2_start
+
+	push	ax
+
+	mov		dx, offset function_2_answer_1
+	mov		ah, 9h
+	int		21h
+		
+	mov		dl, 27h
+	mov		ah, 02h
+	int		21h
 	
+	pop		ax
+
+	mov		dl, al
+	mov		ah, 02h
+	int		21h
 	
+	mov		dl, 27h
+	int		21h
+	
+	mov		dx, offset function_2_answer_2
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+
+	call	New_Line
+	
+	mov		ax, si
+	call	PutDec
+	
+	mov		dx, offset function_2_answer_3
+	mov		ah, 9h
+	int		21h
+		
+
 	ret
 Function_2 endp
 
