@@ -7,10 +7,11 @@ ask_for_string	db 	'Please enter a string (max 50 characters): $'
 new_line_string	db	13, 10, '$'
 
 function_list	db 	'Please enter the number of the function you wish to perform:', 13, 13, 10
-				db	'1 Determine where the first occurrence of a user-input character is in the string.', 13, 10
-				db	'2 Find the number of occurrences of a certain letter in a string', 13, 10
-				db	'3 Find the length of the input string', 13, 10
-				db	'4 Find the number of characters of the input string', 13, 10
+				db	'0 Determine where the first occurrence of a user-input character is in the string.', 13, 10
+				db	'1 Find the number of occurrences of a certain letter in a string', 13, 10
+				db	'2 Find the length of the input string', 13, 10
+				db	'3 Find the number of characters of the input string', 13, 10
+				db	'4 Replace every occurrence of a certain letter with another symbol', 13, 10
 				db	'5 Capitalize the letters in the string', 13, 10
 				db	'6 Make each letter lower case', 13, 10
 				db	'7 Toggle the case of each letter', 13, 10
@@ -19,30 +20,39 @@ function_list	db 	'Please enter the number of the function you wish to perform:'
 				
 which_function	db	'which function would you like to perform?: $'
 
-function_1_q	db	'Enter a character to determine the first occurrence of: $'
+function_0_q	db	'Enter a character to determine the first occurrence of: $'
 
-function_1_answer_1	db 'The first $'
-function_1_answer_2 db ' in the string: ', 13, 10, '$'
-function_1_answer_3	db 'occurs in position $'
+function_0_answer_1	db 'The first $'
+function_0_answer_2 db ' in the string: ', 13, 10, '$'
+function_0_answer_3	db 'occurs in position $'
 
-function_2_q	db	'Enter a character to determine the number of occurrences of: $'
+function_1_q	db	'Enter a character to determine the number of occurrences of: $'
 
-function_2_answer_1 db 'The character $'
-function_2_answer_2 db 'occurs in the string:', 13, 10, '$'
-function_2_answer_3 db ' times $'
+function_1_answer_1 db 'The character $'
+function_1_answer_2 db 'occurs in the string:', 13, 10, '$'
+function_1_answer_3 db ' times $'
 
 
-function_3_answer_1	db	'There are $'
-function_3_answer_2	db	' characters in the string: ', 13, 10, '$'
+function_2_answer_1	db	'There are $'
+function_2_answer_2	db	' characters in the string: ', 13, 10, '$'
 
-function_4_answer_1 db  'There are $'
-function_4_answer_2 db	' characters in the string:', 13, 10, '$'
+function_3_answer_1 db  'There are $'
+function_3_answer_2 db	' characters in the string:', 13, 10, '$'
+
+function_4_q_1		db	'Enter a character to replace: $'
+function_4_q_2		db	'Enter replacement character: $'
+
+function_4_answer_1 db	'Replacing all of the $'
+function_4_answer_2 db	's in the string:', 13, 10, '$'
+function_4_answer_3 db	'with $'
+function_4_answer_4 db	' yields', 13, 10, '$'
 
 invalid_selection_string	db	'You entered an invalid selection, try again.', 13, 10, '$'
 char_not_in_string			db 	'You entered a character that is not in the string.', 13, 10, '$'
 
 input_string		db	'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
 input_string_length	dw 0
+new_string			db	'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
 
 .code
 	extern  putdec:near
@@ -72,11 +82,16 @@ select_function:
 	call	New_Line
 	call	New_Line
 
+	cmp		al, '0'
+	jne		f1
+	call	Function_0
+	jmp		done_selecting_function
+f1:	
 	cmp		al, '1'
 	jne		f2
 	call	Function_1
 	jmp		done_selecting_function
-f2:	
+f2:
 	cmp		al, '2'
 	jne		f3
 	call	Function_2
@@ -131,7 +146,37 @@ done_selecting_function:
 	int		21h
 JAM_Project2 endp
 
+Copy_Input_To_New proc
+	
+	push	bx	
+	push	cx
+	push	si
+	push	di
+	
+	mov		si, offset input_string
+	mov		di, offset new_string
 
+	mov		cx, 25
+
+repeat_loop:
+
+	mov		bx, [si]
+	mov		[di], bx
+	inc 	di
+	inc 	di
+	inc		si
+	inc		si
+	dec		cx
+	jnz		repeat_loop
+
+	pop		di
+	pop		si
+	pop		cx
+	pop		bx
+
+	ret
+
+Copy_Input_To_New endp
 
 New_Line proc
 	
@@ -191,14 +236,14 @@ get_input_complete:
 	ret
 Get_Input endp
 
-Function_1 proc
+Function_0 proc
 	
 	push	ax
 	push	bx
 	push	cx
 	push	dx
 
-	mov		dx, offset function_1_q
+	mov		dx, offset function_0_q
 	mov		ah, 9h
 	int		21h
 
@@ -209,7 +254,7 @@ Function_1 proc
 
 	mov		bx, offset input_string
 
-f1_next_char:
+f0_next_char:
 	
 	cmp		cx, input_string_length
 	je		not_in_string
@@ -218,13 +263,13 @@ f1_next_char:
 
 	cmp		dl, al
 
-	je		f1_done
+	je		f0_done
 	
 	inc		bx
 	
 	inc		cx
 
-	jmp		f1_next_char
+	jmp		f0_next_char
 not_in_string:
 
 	call	New_Line
@@ -233,18 +278,96 @@ not_in_string:
 	mov		ah, 9h
 	int		21h
 
-	jmp		f1_skip_print
+	jmp		f0_skip_print
 
-f1_done:
+f0_done:
 	
 	call	New_Line
+
+	push	ax
+
+	mov		dx, offset function_0_answer_1
+	mov		ah, 9h
+	int		21h
+	
+	mov		dl, 27h
+	mov		ah, 02h
+	int		21h
+	
+	pop		ax
+
+	mov		dl, al
+	mov		ah, 02h
+	int		21h
+	
+	mov		dl, 27h
+	int		21h
+	
+	mov		dx, offset function_0_answer_2
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset input_string
+	int		21h
+	
+	call	New_Line
+	
+	mov		dx, offset function_0_answer_3
+	mov		ah, 9h
+	int		21h
+	
+	mov		ax, cx
+	call	PutDec	
+
+f0_skip_print:
+
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+
+	ret
+Function_0 endp
+
+Function_1 proc
+
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+
+	mov		dx, offset function_1_q
+	mov		ah, 9h
+	int		21h
+
+	mov		ah, 01h
+	int		21h
+
+	call	New_Line
+	
+	mov		cx, input_string_length
+	mov		bx, offset input_string 
+	xor		si, si
+
+f1_start:
+
+	mov		dx, [bx]
+	cmp		al, dl
+	jne		f1_cont
+	inc		si
+
+f1_cont:
+	inc		bx
+	dec		cx
+	jnz		f1_start
 
 	push	ax
 
 	mov		dx, offset function_1_answer_1
 	mov		ah, 9h
 	int		21h
-	
+		
 	mov		dl, 27h
 	mov		ah, 02h
 	int		21h
@@ -263,84 +386,6 @@ f1_done:
 	int		21h
 	
 	mov		dx, offset input_string
-	int		21h
-	
-	call	New_Line
-	
-	mov		dx, offset function_1_answer_3
-	mov		ah, 9h
-	int		21h
-	
-	mov		ax, cx
-	call	PutDec	
-
-f1_skip_print:
-
-	pop		dx
-	pop		cx
-	pop		bx
-	pop		ax
-
-	ret
-Function_1 endp
-
-Function_2 proc
-
-	push	ax
-	push	bx
-	push	cx
-	push	dx
-	push	si
-
-	mov		dx, offset function_2_q
-	mov		ah, 9h
-	int		21h
-
-	mov		ah, 01h
-	int		21h
-
-	call	New_Line
-	
-	mov		cx, input_string_length
-	mov		bx, offset input_string 
-	xor		si, si
-
-f2_start:
-
-	mov		dx, [bx]
-	cmp		al, dl
-	jne		f2_cont
-	inc		si
-
-f2_cont:
-	inc		bx
-	dec		cx
-	jnz		f2_start
-
-	push	ax
-
-	mov		dx, offset function_2_answer_1
-	mov		ah, 9h
-	int		21h
-		
-	mov		dl, 27h
-	mov		ah, 02h
-	int		21h
-	
-	pop		ax
-
-	mov		dl, al
-	mov		ah, 02h
-	int		21h
-	
-	mov		dl, 27h
-	int		21h
-	
-	mov		dx, offset function_2_answer_2
-	mov		ah, 9h
-	int		21h
-	
-	mov		dx, offset input_string
 	mov		ah, 9h
 	int		21h
 
@@ -349,7 +394,7 @@ f2_cont:
 	mov		ax, si
 	call	PutDec
 	
-	mov		dx, offset function_2_answer_3
+	mov		dx, offset function_1_answer_3
 	mov		ah, 9h
 	int		21h
 		
@@ -360,20 +405,20 @@ f2_cont:
 	pop		ax
 
 	ret
-Function_2 endp
+Function_1 endp
 
-Function_3 proc
+Function_2 proc
 	push   	ax
 	push	dx
 
-	mov		dx, offset function_3_answer_1
+	mov		dx, offset function_2_answer_1
 	mov		ah, 9h
 	int		21h
 
 	mov		ax, input_string_length
 	call	PutDec
 
-	mov		dx, offset function_3_answer_2
+	mov		dx, offset function_2_answer_2
 	mov		ah, 9h
 	int		21h
 
@@ -385,10 +430,101 @@ Function_3 proc
 	pop 	ax
 
 	ret
+Function_2 endp
+
+Function_3 proc
+
+	ret
 Function_3 endp
 
 Function_4 proc
+	
+	mov		dx, offset function_4_q_1
+	mov		ah, 9h
+	int		21h
 
+	mov		ah, 01h
+	int		21h
+
+	xor		ah, ah
+
+	mov		si, ax				;char to replace
+
+	call	New_Line
+
+	mov		dx, offset function_4_q_2
+	mov		ah, 9h
+	int		21h
+	mov		ah, 01h
+	int		21h
+
+	xor		ah, ah
+	
+	mov		di, ax				;replacement char
+
+	call	New_Line
+	call	Copy_Input_To_New
+
+	mov		bx, offset new_string
+	mov		cx, input_string_length
+
+f4_start:
+
+	mov		dx, [bx]
+	mov		ax, si
+
+	cmp		dl, al
+	jne		f4_cont
+
+	mov		ax, di
+	mov		dl, al
+	mov		[bx], dx
+
+f4_cont:
+
+	inc		bx
+	dec		cx
+	jne		f4_start
+
+	mov		dx, offset function_4_answer_1
+	mov		ah, 9h
+	int		21h
+	
+	mov		dl, 27h
+	mov		ah, 02h
+	int		21h
+	
+	mov		dx, si
+	mov		ah, 02h
+	int		21h
+	
+	mov		dx, offset function_4_answer_2
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+
+	call	New_Line
+
+	mov		dx, offset function_4_answer_3
+	mov		ah, 9h
+	int		21h
+
+	mov		dx, di
+	mov		ah, 02h
+	int		21h
+
+	mov		dx, offset function_4_answer_4
+	mov		ah, 9h
+	int 	21h
+
+	mov		dx, offset new_string
+	mov		ah, 9h
+	int		21h
+
+		
 	ret
 Function_4 endp
 
