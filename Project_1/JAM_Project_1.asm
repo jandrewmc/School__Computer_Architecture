@@ -26,7 +26,7 @@ bad_input		db 'Bad input!  Try Again!', 13, 10, '$'
 new_line		db 13, 10, '$'
 
 .code
-	extern	GetDec : NEAR, Puthex : NEAR, PutDec : NEAR
+	extern	GetDec : NEAR, PutDec : NEAR
 
 Project1		proc
 
