@@ -39,6 +39,10 @@ Project1		proc
 
 Start_Again:
 
+			mov		dx, offset new_line
+			mov		ah, 9h
+			int		21h
+
 			mov		dx, offset get_input				;Print out get input message
 			mov		ah, 9h
 			int		21h
@@ -219,6 +223,10 @@ Ask_Again:
 			cmp		al, 'N'
 			je		End_Prog
 
+			mov		dx, offset new_line
+			mov		ah, 9h
+			int		21h
+		
 			mov		dx, offset bad_input
 			mov		ah, 9h
 			int		21h		
@@ -239,6 +247,11 @@ PutDDec16bit	proc
 			push	bx
 			push	cx
 			push	dx
+			push	si
+			push	di
+
+			xor		di, di
+			xor		si, si
 
 			mov		bx, '$'
 			push	bx
@@ -295,7 +308,8 @@ Done:
 			jmp		Done
 
 TotallyDone:
-			
+			pop		di
+			pop		si
 			pop		dx
 			pop		cx
 			pop		bx

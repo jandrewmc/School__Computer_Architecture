@@ -247,6 +247,11 @@ PutDDec16bit	proc
 			push	bx
 			push	cx
 			push	dx
+			push	si
+			push	di
+
+			xor		di, di
+			xor		si, si
 
 			mov		bx, '$'
 			push	bx
@@ -303,7 +308,8 @@ Done:
 			jmp		Done
 
 TotallyDone:
-			
+			pop		di
+			pop		si
 			pop		dx
 			pop		cx
 			pop		bx

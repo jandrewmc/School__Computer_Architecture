@@ -1,21 +1,21 @@
 [shared-]
-	pmark="C:\DEV\COMPUT~1\hw1pt2.asm" 6 1
+	pmark=
 	version=3
 [debug-]
-	target="c:\dev\comput~1\hw1.exe"
+	target="c:\dev\comput~1\testcall.exe"
 	synonym=;C:\DEV\COMPUT~1
-	srcwin=vs1- /a+b+c+l+s+t+
+	srcwin=vs1+ /a+b+c+l+s+t+
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
 	wndstate=1 28 21 52 21 0 0 0 0 0 0 0 0 0 -1
 	wndstate=2 34 8 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 67 41 0 1 1 1 0 8 0 3 0 0 0 -1
+	wndstate=3 67 41 0 1 1 1 0 0 0 451 451 0 0 -1
 	wndstate=4 67 9 3 12 0 0 0 0 0 0 0 0 0 -1
 	wndstate=5 40 20 40 1 0 0 0 0 0 0 0 0 0 -1
 	wndstate=6 67 8 3 21 0 0 0 0 0 0 0 0 0 -1
-	wndstate=7 13 41 67 1 0 1 0 0 0 0 0 0 0 -1
+	wndstate=7 13 41 67 1 0 1 0 0 0 1 0 0 0 -1
 	wndstate=8 67 8 0 26 0 0 0 0 0 0 0 0 0 -1
-	wndstate=9 26 21 26 21 0 1 0 1 0 1 0 0 0 -1
+	wndstate=9 26 21 26 21 0 0 0 0 0 0 0 0 0 -1
 	command=use auto
 	command=n10
 	screensize=43
