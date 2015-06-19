@@ -35,6 +35,9 @@ function_2_answer_3 db ' times $'
 function_3_answer_1	db	'There are $'
 function_3_answer_2	db	' characters in the string: ', 13, 10, '$'
 
+function_4_answer_1 db  'There are $'
+function_4_answer_2 db	' characters in the string:', 13, 10, '$'
+
 invalid_selection_string	db	'You entered an invalid selection, try again.', 13, 10, '$'
 char_not_in_string			db 	'You entered a character that is not in the string.', 13, 10, '$'
 
@@ -189,6 +192,12 @@ get_input_complete:
 Get_Input endp
 
 Function_1 proc
+	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+
 	mov		dx, offset function_1_q
 	mov		ah, 9h
 	int		21h
@@ -196,11 +205,15 @@ Function_1 proc
 	mov		ah, 01h
 	int		21h
 
-	mov		cx, 1
+	xor		cx, cx
 
 	mov		bx, offset input_string
 
 f1_next_char:
+	
+	cmp		cx, input_string_length
+	je		not_in_string
+	
 	mov		dx, [bx]
 
 	cmp		dl, al
@@ -209,9 +222,6 @@ f1_next_char:
 	
 	inc		bx
 	
-	cmp		cx, input_string_length
-	je		not_in_string
-
 	inc		cx
 
 	jmp		f1_next_char
@@ -266,10 +276,21 @@ f1_done:
 
 f1_skip_print:
 
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+
 	ret
 Function_1 endp
 
 Function_2 proc
+
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
 
 	mov		dx, offset function_2_q
 	mov		ah, 9h
@@ -332,6 +353,11 @@ f2_cont:
 	mov		ah, 9h
 	int		21h
 		
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
 
 	ret
 Function_2 endp

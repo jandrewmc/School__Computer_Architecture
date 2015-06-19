@@ -277,6 +277,8 @@ Function_2 proc
 
 	mov		ah, 01h
 	int		21h
+
+	call	New_Line
 	
 	mov		cx, input_string_length
 	mov		bx, offset input_string 
