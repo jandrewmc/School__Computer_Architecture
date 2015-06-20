@@ -6,7 +6,7 @@
 ask_for_string	db 	'Please enter a string (max 50 characters): $'
 new_line_string	db	13, 10, '$'
 
-function_list	db 	'Please enter the number of the function you wish to perform:', 13, 13, 10
+function_list	db 	'Please enter the number of the function you wish to perform (q to quit):', 13, 13, 10
 				db	'0 Determine where the first occurrence of a user-input character is in the string.', 13, 10
 				db	'1 Find the number of occurrences of a certain letter in a string', 13, 10
 				db	'2 Find the length of the input string', 13, 10
@@ -47,6 +47,11 @@ function_4_answer_2 db	's in the string:', 13, 10, '$'
 function_4_answer_3 db	'with $'
 function_4_answer_4 db	' yields', 13, 10, '$'
 
+function_5_answer_1 db	'Capitalizing each letter in the string', 13, 10, '$'
+function_5_answer_2 db	'yeilds', 13, 10, '$'
+
+
+
 invalid_selection_string	db	'You entered an invalid selection, try again.', 13, 10, '$'
 char_not_in_string			db 	'You entered a character that is not in the string.', 13, 10, '$'
 
@@ -71,6 +76,8 @@ JAM_Project2 proc
 	int		21h
 
 select_function:
+	
+	call	New_Line
 
 	mov		dx, offset which_function
 	mov		ah, 9h
@@ -78,6 +85,11 @@ select_function:
 	
 	mov		ah, 1h
 	int		21h
+	
+	cmp		al, 'q'
+	je		exit_prog
+	cmp		al, 'Q'
+	je		exit_prog
 
 	call	New_Line
 	call	New_Line
@@ -85,52 +97,52 @@ select_function:
 	cmp		al, '0'
 	jne		f1
 	call	Function_0
-	jmp		done_selecting_function
+	jmp		select_function
 f1:	
 	cmp		al, '1'
 	jne		f2
 	call	Function_1
-	jmp		done_selecting_function
+	jmp		select_function
 f2:
 	cmp		al, '2'
 	jne		f3
 	call	Function_2
-	jmp		done_selecting_function
+	jmp		select_function
 f3:
 	cmp		al, '3'
 	jne		f4
 	call	Function_3
-	jmp		done_selecting_function
+	jmp		select_function
 f4:
 	cmp		al, '4'
 	jne		f5
 	call	Function_4
-	jmp		done_selecting_function
+	jmp		select_function
 f5:
 	cmp		al, '5'
 	jne		f6
 	call	Function_5
-	jmp		done_selecting_function
+	jmp		select_function
 f6:
 	cmp		al, '6'
 	jne		f7
 	call	Function_6
-	jmp		done_selecting_function
+	jmp		select_function
 f7:
 	cmp		al, '7'
 	jne		f8
 	call	Function_7
-	jmp		done_selecting_function
+	jmp		select_function
 f8:
 	cmp		al, '8'
 	jne		f9
 	call	Function_8
-	jmp		done_selecting_function
+	jmp		select_function
 f9:
 	cmp		al, '9'
 	jne		invalid_selection
 	call	Function_9
-	jmp		done_selecting_function
+	jmp		select_function
 
 invalid_selection:
 
@@ -140,8 +152,8 @@ invalid_selection:
 
 	jmp		select_function
 
-done_selecting_function:
-
+exit_prog:
+	
 	mov		ah, 4ch
 	int		21h
 JAM_Project2 endp
@@ -530,10 +542,64 @@ Function_4 endp
 
 Function_5 proc
 
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+
+	call	Copy_Input_To_New
+
+	mov		si, offset new_string
+
+	mov		cx, input_string_length
+
+f5_next_letter:
+
+	mov		bx, [si]
+	cmp		bl, 'a'
+	jl		f5_skip_char
+	cmp		bl, 'z'
+	jg		f5_skip_char
+
+	xor	 	bl, 20h
+	mov		[si], bx
+
+f5_skip_char:
+	
+	inc		si
+	dec		cx
+	jnz		f5_next_letter
+	
+	mov		dx, offset function_5_answer_1
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+	
+	call	New_Line
+	
+	mov		dx, offset function_5_answer_2
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset new_string
+	mov		ah, 9h
+	int		21h		
+	
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+
 	ret
 Function_5 endp
 
 Function_6 proc
+	
 
 	ret
 Function_6 endp
@@ -552,5 +618,4 @@ Function_9 proc
 
 	ret
 Function_9 endp
-
 			end JAM_Project2	
