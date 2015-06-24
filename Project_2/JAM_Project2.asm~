@@ -6,19 +6,18 @@
 ask_for_string	db 	'Please enter a string (max 50 characters): $'
 new_line_string	db	13, 10, '$'
 
-function_list	db 	'Please enter the number of the function you wish to perform (q to quit):', 13, 13, 10
-				db	'0 Determine where the first occurrence of a user-input character is in the string.', 13, 10
-				db	'1 Find the number of occurrences of a certain letter in a string', 13, 10
+function_list	db	'0 Determine where the first occurrence of a given character in the string.', 13, 10
+				db	'1 Find the number of occurrences of a certain character in a string', 13, 10
 				db	'2 Find the length of the input string', 13, 10
 				db	'3 Find the number of characters of the input string', 13, 10
-				db	'4 Replace every occurrence of a certain letter with another symbol', 13, 10
+				db	'4 Replace every occurrence of a certain character with another character', 13, 10
 				db	'5 Capitalize the letters in the string', 13, 10
 				db	'6 Make each letter lower case', 13, 10
 				db	'7 Toggle the case of each letter', 13, 10
 				db	'8 Input a new string', 13, 10
-				db	'9 Undo last action', 13, 10, '$'
+				db	'9 Undo last modifying action (options 4-9)', 13, 10, '$'
 				
-which_function	db	'which function would you like to perform?: $'
+which_function	db	'which function would you like to perform? (q to quit, p to display function list): $'
 
 function_0_q	db	'Enter a character to determine the first occurrence of: $'
 
@@ -37,7 +36,7 @@ function_2_answer_1	db	'There are $'
 function_2_answer_2	db	' characters in the string: ', 13, 10, '$'
 
 function_3_answer_1 db  'There are $'
-function_3_answer_2 db	' characters in the string:', 13, 10, '$'
+function_3_answer_2 db	' alpha-numeric characters in the string:', 13, 10, '$'
 
 function_4_q_1		db	'Enter a character to replace: $'
 function_4_q_2		db	'Enter replacement character: $'
@@ -50,26 +49,36 @@ function_4_answer_4 db	' yields', 13, 10, '$'
 function_5_answer_1 db	'Capitalizing each letter in the string', 13, 10, '$'
 function_5_answer_2 db	'yeilds', 13, 10, '$'
 
+function_6_answer_1 db	'Making each letter lowercase in the string', 13, 10, '$'
+function_6_answer_2 db	'yields', 13, 10, '$'
 
+function_7_answer_1 db	'Toggling the case of each letter in the string:', 13, 10, '$'
+function_7_answer_2 db	'yields:', 13, 10, '$'
 
 invalid_selection_string	db	'You entered an invalid selection, try again.', 13, 10, '$'
 char_not_in_string			db 	'You entered a character that is not in the string.', 13, 10, '$'
 
 input_string		db	'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
-input_string_length	dw 0
-new_string			db	'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+input_string_length	dw 	0
 
+new_string			db	'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+new_string_length	dw	0
+
+invalid_string_input db 'Invalid string input...input string must have more than 0 characters.', 13, 10, '$'
+
+cant_undo			db	'No actions have been performed to undo.', 13, 10, '$'
 .code
 	extern  putdec:near
-JAM_Project2 proc
+main proc
 	mov		ax, @data
 	mov		ds, ax
 
-	mov		dx, offset ask_for_string
-	mov		ah, 9h
-	int		21h
-
 	call	Get_Input
+
+select_function_with_list:
+
+	call	New_Line
+	call	New_Line
 
 	mov		dx, offset function_list
 	mov		ah, 9h
@@ -78,7 +87,7 @@ JAM_Project2 proc
 select_function:
 	
 	call	New_Line
-
+	
 	mov		dx, offset which_function
 	mov		ah, 9h
 	int		21h
@@ -86,13 +95,19 @@ select_function:
 	mov		ah, 1h
 	int		21h
 	
-	cmp		al, 'q'
+	cmp		al, 'q'						;q quits the program
 	je		exit_prog
 	cmp		al, 'Q'
 	je		exit_prog
+	cmp		al, 'p'						;p prints out the function list
+	je		select_function_with_list
+	cmp		al, 'P'
+	je		select_function_with_list	
 
 	call	New_Line
 	call	New_Line
+
+										;check which function was selected
 
 	cmp		al, '0'
 	jne		f1
@@ -156,7 +171,34 @@ exit_prog:
 	
 	mov		ah, 4ch
 	int		21h
-JAM_Project2 endp
+main endp
+
+
+
+;#######################################################################
+;This procedure handles an invalid input string (string with length of 0)
+
+Invalid_Input proc
+
+	push	ax
+	push	dx
+
+	mov		dx, offset invalid_string_input
+	mov		ah, 9h
+	int		21h
+
+	call	New_Line
+
+	pop		dx
+	pop		ax
+
+	ret
+Invalid_Input endp
+
+
+
+;#################################################################
+;To preserve the original string after modification, we copy it
 
 Copy_Input_To_New proc
 	
@@ -174,12 +216,18 @@ repeat_loop:
 
 	mov		bx, [si]
 	mov		[di], bx
+	
 	inc 	di
 	inc 	di
+
 	inc		si
 	inc		si
+	
 	dec		cx
 	jnz		repeat_loop
+
+	mov		ax, input_string_length
+	mov		new_string_length, ax
 
 	pop		di
 	pop		si
@@ -187,8 +235,63 @@ repeat_loop:
 	pop		bx
 
 	ret
-
 Copy_Input_To_New endp
+
+
+
+;######################################################################
+;there are times when we need to swap the saved strings
+
+Swap_Strings	proc
+	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+	push	di
+
+	mov		si, offset input_string
+	mov		di, offset new_string
+	mov		cx, 25
+
+swap_loop:
+	
+	mov		ax, [si]
+	mov		bx, [di]
+	mov		[si], bx
+	mov		[di], ax
+
+	inc		si
+	inc		si
+
+	inc		di
+	inc		di
+		
+	dec		cx
+	cmp		cx, 0
+	jg		swap_loop
+
+	mov		ax, input_string_length
+	mov		bx, new_string_length
+
+	mov		new_string_length, ax
+	mov		input_string_length, bx
+
+	pop		di
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+
+	ret
+Swap_Strings	endp
+
+
+
+;####################################################################
+;There are plenty of times we just want to print a new line
 
 New_Line proc
 	
@@ -203,50 +306,109 @@ New_Line proc
 	pop		ax
 
 	ret
-
 New_Line endp
+
+
+
+;####################################################################
+;When we input a new string from a function call, we need to  the
+;old data out before putting new data in
+
+Clear_Input_String proc
+
+	push	ax
+	push	bx
+	push	cx
+
+	mov		bx, offset input_string
+	mov		cx, 25 
+
+clear_string:
+	mov		ax,	'$$' 
+	mov		[bx], ax
+	inc		bx
+	inc		bx
+	dec		cx
+	jnz		clear_string
+
+	pop		cx
+	pop		bx
+	pop		ax
+
+	ret
+Clear_Input_String endp
+
+
+
+;####################################################################
+;This procedure handles the input string.  It effectively strips out the 
+;unwanted characters from the input.
 
 Get_Input proc
 
-	push	ax						;save registers
+	push	ax
 	push	bx
 	push	cx
 	push	dx
+	
+try_again:
+
+	mov		dx, offset ask_for_string
+	mov		ah, 9h
+	int		21h
 
 	mov		cx, 50
 	mov		bx, offset input_string
 
 get_input_string:
-	
-	mov		ah, 01h					;get char from keyboard
+
+	mov		ah, 08h				;input char without echo
 	int		21h
 
-	cmp		al, 13 					;if the user presses "enter", string is
-	je		get_input_complete		;done being entered
+	cmp		al, 8				;skip backspace
+	je		get_input_string
+	cmp		al, '$'				;skip dollar sign
+	je		get_input_string
+	cmp		al, 13				;enter ends input
+	je		get_input_complete	
 
-	mov		[bx], al				;save in string
-	inc 	bx
+	mov		dl, al				;if valid input, display it
+	mov		ah, 02h
+	int		21h
 
-	dec		cx					
-	jnz		get_input_string
+	mov		[bx], al			;save it
+	inc		bx
+	
+	dec		cx					;if our max has not been reached
+	jnz		get_input_string	;get next character
 
 get_input_complete:
 
-	mov		bx, offset input_string_length
 	mov		dx, 50
 	sub		dx, cx
-	mov		[bx], dx				;calculate and save the length of the string
+	mov		input_string_length, dx		;calculate and save the length of the string
 	
-	call	New_Line
+	cmp		input_string_length, 0
+	jne		input_finished
+	call	Invalid_Input
+	jmp		try_again
+
+input_finished:
+
 	call	New_Line
 
 	pop		dx
 	pop		cx
 	pop		bx
-	pop		ax						;restore registers
-	
+	pop		ax
+
 	ret
 Get_Input endp
+
+
+
+;########################################################################
+;Function 0
 
 Function_0 proc
 	
@@ -341,6 +503,11 @@ f0_skip_print:
 	ret
 Function_0 endp
 
+
+
+;#######################################################################
+;Function 1
+
 Function_1 proc
 
 	push	ax
@@ -419,6 +586,11 @@ f1_cont:
 	ret
 Function_1 endp
 
+
+
+;#######################################################################
+;Function 2
+
 Function_2 proc
 	push   	ax
 	push	dx
@@ -444,13 +616,89 @@ Function_2 proc
 	ret
 Function_2 endp
 
+
+
+;#######################################################################
+;Function 3
+
 Function_3 proc
+	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+
+	xor		si, si
+
+	mov		bx, offset input_string
+	mov		cx, input_string_length
+
+f3_start:
+	mov		dx, [bx]
+
+	cmp		dl, '0'
+	jb		f3_end
+	cmp		dl, '9'
+	ja		f3_check_letters
+	jmp		f3_char_found
+
+f3_check_letters:
+
+	cmp		dl, 'A'
+	jb		f3_end
+	and		dl, 11011111b
+	cmp		dl, 'Z'
+	ja		f3_end
+	
+f3_char_found:
+
+	inc		si
+
+f3_end:
+	
+	inc		bx
+	dec		cx
+	jnz		f3_start
+
+	mov		dx, offset function_3_answer_1
+	mov		ah, 9h
+	int		21h
+
+	mov		ax, si
+	call	PutDec
+
+	mov		dx, offset function_3_answer_2
+	mov		ah, 9h
+	int		21h
+
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
 
 	ret
 Function_3 endp
 
+
+
+;########################################################################
+;Function 3
+
 Function_4 proc
-	
+
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+	push	di
+
 	mov		dx, offset function_4_q_1
 	mov		ah, 9h
 	int		21h
@@ -536,12 +784,24 @@ f4_cont:
 	mov		ah, 9h
 	int		21h
 
-		
+	pop		di
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+
 	ret
 Function_4 endp
 
 Function_5 proc
 	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+
 	call	Copy_Input_To_New
 
 	mov		si, offset new_string
@@ -581,29 +841,180 @@ f5_skip_char:
 	
 	mov		dx, offset new_string
 	mov		ah, 9h
-	int		21h		
+	int		21h	
+
+	call	Swap_Strings
+
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
 
 	ret
 Function_5 endp
 
 Function_6 proc
 	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
+	push	si
+
+	call	Copy_Input_To_New
+	
+	mov		si, offset new_string
+	mov		cx, input_string_length
+		
+f6_next_letter:
+
+	mov		bx, [si]
+	
+	cmp		bl, 'A'
+	jl		f6_skip_letter
+	cmp		bl, 'Z'
+	jg		f6_skip_letter
+	
+	xor		bl, 020h
+	
+	mov		[si], bx
+
+f6_skip_letter:
+
+	inc		si
+	dec		cx
+	jnz		f6_next_letter
+
+	mov		dx, offset function_6_answer_1
+	mov		ah, 9h
+	int		21h
+	
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+
+	call	New_Line
+
+	mov		dx, offset function_6_answer_2
+	mov		ah, 9h
+	int		21h
+
+	mov		dx, offset new_string
+	mov		ah, 9h
+	int		21h
+
+	call	Swap_Strings
+	
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
 
 	ret
 Function_6 endp
 
 Function_7 proc
+	
+	push	ax
+	push	bx
+	push	cx
+	push	dx
 
+	call	Copy_Input_To_New
+
+	mov		bx, offset new_string
+	mov		cx, input_string_length
+
+f7_start:
+
+	mov		dx, [bx]
+
+	cmp		dl, 'A'
+	jb		f7_end
+	cmp		dl, 'Z'
+	ja		f7_check_lower
+
+	xor		dl, 20h
+	jmp		f7_end
+
+f7_check_lower:
+
+	cmp		dl, 'a'
+	jb		f7_end
+	cmp		dl, 'z'
+	ja		f7_end
+
+	xor		dl, 20h
+
+f7_end:
+
+	mov		[bx], dx
+	inc		bx
+	dec		cx
+	jnz		f7_start
+
+	mov		dx, offset function_7_answer_1
+	mov		ah, 9h
+	int		21h
+
+	mov		dx, offset input_string
+	mov		ah, 9h
+	int		21h
+
+	call	New_Line
+	
+	mov		dx, offset function_7_answer_2
+	mov		ah, 9h
+	int		21h
+
+	mov		dx, offset new_string
+	mov		ah, 9h
+	int		21h
+
+	call	Swap_Strings
+
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+	
 	ret
 Function_7 endp
 
 Function_8 proc
 
+	call	Swap_Strings
+	call	Clear_Input_String
+	call 	Get_Input
+	
 	ret
 Function_8 endp
 
 Function_9 proc
 
+	push	ax
+	push	dx
+
+	mov		dx, new_string_length
+	cmp		dx, 0
+	jne		perform_undo
+	
+	mov		dx, offset cant_undo
+	mov		ah, 9h
+	int		21h
+	jmp		finished_undo	
+
+perform_undo:
+	
+	call	Swap_Strings
+
+finished_undo:
+
+	pop		dx
+	pop		ax
+
 	ret
 Function_9 endp
-			end JAM_Project2	
+			end main	
