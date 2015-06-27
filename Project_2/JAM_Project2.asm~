@@ -784,6 +784,8 @@ f4_cont:
 	mov		ah, 9h
 	int		21h
 
+	call	Swap_Strings
+
 	pop		di
 	pop		si
 	pop		dx

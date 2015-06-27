@@ -421,9 +421,20 @@ Function_0 proc
 	mov		ah, 9h
 	int		21h
 
-	mov		ah, 01h
+f0_get_char:
+
+	mov		ah, 08h				;input char without echo
 	int		21h
 
+	cmp		al, 8				;skip backspace
+	je		f0_get_char	
+	cmp		al, '$'				;skip dollar sign
+	je		f0_get_char
+
+	mov		dl, al				;if valid input, display it
+	mov		ah, 02h
+	int		21h
+	
 	xor		cx, cx
 
 	mov		bx, offset input_string
@@ -520,7 +531,18 @@ Function_1 proc
 	mov		ah, 9h
 	int		21h
 
-	mov		ah, 01h
+f1_get_char:
+
+	mov		ah, 08h				;input char without echo
+	int		21h
+
+	cmp		al, 8				;skip backspace
+	je		f1_get_char	
+	cmp		al, '$'				;skip dollar sign
+	je		f1_get_char
+
+	mov		dl, al				;if valid input, display it
+	mov		ah, 02h
 	int		21h
 
 	call	New_Line
@@ -703,7 +725,18 @@ Function_4 proc
 	mov		ah, 9h
 	int		21h
 
-	mov		ah, 01h
+f4_get_char:
+
+	mov		ah, 08h				;input char without echo
+	int		21h
+
+	cmp		al, 8				;skip backspace
+	je		f4_get_char	
+	cmp		al, '$'				;skip dollar sign
+	je		f4_get_char
+
+	mov		dl, al				;if valid input, display it
+	mov		ah, 02h
 	int		21h
 
 	xor		ah, ah
@@ -715,7 +748,19 @@ Function_4 proc
 	mov		dx, offset function_4_q_2
 	mov		ah, 9h
 	int		21h
-	mov		ah, 01h
+	
+f4_get_char_r:
+
+	mov		ah, 08h				;input char without echo
+	int		21h
+
+	cmp		al, 8				;skip backspace
+	je		f4_get_char_r
+	cmp		al, '$'				;skip dollar sign
+	je		f4_get_char_r
+
+	mov		dl, al				;if valid input, display it
+	mov		ah, 02h
 	int		21h
 
 	xor		ah, ah
