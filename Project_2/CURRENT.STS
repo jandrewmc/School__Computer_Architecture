@@ -2,24 +2,25 @@
 	pmark=
 	version=3
 [debug-]
-	target="c:\dev\comput~1\projec~3\proj.exe"
-	synonym=;C:\DEV\COMPUT~1\PROJEC~3
-	genericbp='E  "{main,JAM_Project2.asm,C:\DEV\COMPUT~1\PROJEC~3\proj.EXE} f8"
-	genericbp='E  "{,JAM_Project2.asm,C:\DEV\COMPUT~1\PROJEC~3\proj.EXE} .275"
-	genericbp='E  "{main,JAM_Project2.asm,C:\DEV\COMPUT~1\PROJEC~3\proj.EXE} f9"
+	target="c:\dev\archit~1\projec~3\p2.exe"
+	synonym=;C:\DEV\ARCHIT~1\PROJEC~3
+	genericbp='E  "{,JAM_Project2.asm,C:\DEV\ARCHIT~1\PROJEC~3\p2.EXE} Function_5"
+	genericbp='E  "{,JAM_Project2.asm,C:\DEV\ARCHIT~1\PROJEC~3\p2.EXE} Function_0"
+	genericbp='E  "{,JAM_Project2.asm,C:\DEV\ARCHIT~1\PROJEC~3\p2.EXE} .410"
+	genericbp='E  "{Function_0,JAM_Project2.asm,C:\DEV\ARCHIT~1\PROJEC~3\p2.EXE} f0_skip_print"
 	srcwin=vs1+ /a+b+c+l+s+t+
-	memwin=vm1b 0x0A37:0x0502 
+	memwin=vm1b 0x0A4D:0x055F 
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
 	wndstate=1 80 9 0 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=2 34 9 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 80 30 0 10 0 1 0 0 0 538 537 0 0 -1
+	wndstate=3 80 30 0 10 1 1 0 0 0 314 304 0 0 -1
 	wndstate=4 67 12 3 13 0 0 0 0 0 0 0 0 0 -1
-	wndstate=5 67 13 0 36 1 1 0 0 0 99 98 0 0 -1
+	wndstate=5 67 13 0 36 0 1 0 0 0 106 106 0 0 -1
 	wndstate=6 67 9 3 25 0 0 0 0 0 0 0 0 0 -1
 	wndstate=7 13 48 67 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=8 67 9 0 31 0 0 0 0 0 0 0 0 0 -1
-	wndstate=9 80 9 0 40 0 1 0 1 0 5 0 0 0 -1
+	wndstate=9 80 9 0 40 0 1 0 1 0 9 3 0 0 -1
 	command=use auto
 	command=n10
 	screensize=50
