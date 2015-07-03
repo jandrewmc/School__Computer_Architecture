@@ -55,6 +55,9 @@ function_6_answer_2 	db	'yields', 13, 10, '$'
 function_7_answer_1 	db	'Toggling the case of each letter in the string:', 13, 10, '$'
 function_7_answer_2 	db	'yields:', 13, 10, '$'
 
+function_9_answer_1		db	'Last modifying action undone', 13, 10, '$'
+function_9_answer_2		db	'Current string:', 13, 10, '$'
+
 invalid_selection_string	db	'You entered an invalid selection, try again.', 13, 10, '$'
 char_not_in_string			db 	'You entered a character that is not in the string.', 13, 10, '$'
 
@@ -866,6 +869,11 @@ perform_undo:
 	call	Swap_Strings
 
 finished_undo:
+
+	_printstring function_9_answer_1
+	_printstring function_9_answer_2
+	_printstring_bychar input_string_length, input_string
+	_printstring new_line
 
 	_restore_regs
 
