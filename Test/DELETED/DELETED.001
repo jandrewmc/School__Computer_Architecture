@@ -1,0 +1,8 @@
+	.MODEL SMALL
+	.8086
+	.STACK 100h
+	.DATA
+	.CODE
+Test	PROC
+Test	ENDP
+		END	Test
