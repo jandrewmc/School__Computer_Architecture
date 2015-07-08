@@ -2,20 +2,21 @@
 	pmark=
 	version=3
 [debug-]
-	target="c:\dev\archit~1\test\tp.exe"
+	target="c:\dev\archit~1\test\p.exe"
 	synonym=;C:\DEV\ARCHIT~1\TEST
+	genericbp='E  "{,JAM_Opportunity_1.asm,C:\DEV\ARCHIT~1\TEST\p.EXE} .38"
 	srcwin=vs1+ /a+b+c+l+s+t+
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
 	wndstate=1 80 9 0 1 0 0 0 0 0 0 0 0 0 -1
 	wndstate=2 34 9 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 63 48 0 1 0 1 0 0 0 87 52 0 0 -1
+	wndstate=3 63 48 0 1 1 1 0 0 0 62 52 0 0 -1
 	wndstate=4 67 12 3 13 0 0 0 0 0 0 0 0 0 -1
 	wndstate=5 67 9 0 22 0 0 0 0 0 0 0 0 0 -1
 	wndstate=6 67 9 3 25 0 0 0 0 0 0 0 0 0 -1
 	wndstate=7 17 48 63 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=8 67 9 0 31 0 0 0 0 0 0 0 0 0 -1
-	wndstate=9 80 9 0 40 1 1 0 1 0 1 0 0 0 -1
+	wndstate=9 80 9 0 40 0 1 0 1 0 3 0 0 0 -1
 	command=use auto
 	command=n10
 	screensize=50

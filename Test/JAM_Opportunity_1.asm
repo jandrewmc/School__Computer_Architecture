@@ -62,7 +62,7 @@ Negative_Num:	add		ax, bx
 				jz		Finish_Add
 				neg		ax
 
-Finish_Add:		_putstr add_answer_1
+Finish_Add:		sputstr add_answer_1
 				call	PutDec
 
 Subtract:		mov		ax, bx
@@ -70,7 +70,7 @@ Subtract:		mov		ax, bx
 				jz		Finish_Sub
 				neg		ax
 
-Finish_Sub:		_putstr add_answer_2
+Finish_Sub:		sputstr add_answer_2
 				call	PutDec
 
 Should_Repeat:	_putstr new_line
