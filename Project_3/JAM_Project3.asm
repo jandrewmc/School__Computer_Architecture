@@ -12,6 +12,8 @@ change_radix_prompt	db 'Do you want to change either input or output radix? (y/n
 number_A_prompt		db 'Enter the number A: $'
 number_B_prompt 	db 'Enter the number B: $'
 
+input_to_large		db 'Your input was too large, enter a value (-32768 <= input <= 32767 decimal): $'
+
 input_radix			dw 0
 output_radix		dw 0
 .code
@@ -41,7 +43,7 @@ GetRad proc
 			
 			cmp		al, '-'
 			jne		Not_Neg
-			mov		di, 0
+			mov		di, 1
 	
 			mov		dl, al
 			mov		ah, 02h
@@ -121,9 +123,29 @@ Invalid_Input:
 			
 End_Get:
 			
-			test	bh, 10000000b
-			jz		Done
+			cmp		di, 1
+			jne		Size_Var
+			cmp		bx, 32768
+			ja		Oversized_Value
+			je		Special_Case
 			neg		bx
+			jmp		Done
+
+Size_Var:
+
+			cmp		bx, 32767
+			ja		Oversized_Value
+			jmp		Done
+	
+Special_Case:
+
+			mov		bx, 32768
+			jmp		Done
+
+Oversized_Value:
+
+			_putstr input_to_large
+			jmp GetRad			 
 
 Done:
 
