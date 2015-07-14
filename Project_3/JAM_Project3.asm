@@ -5,6 +5,8 @@ include pcmac.inc
 
 .data
 
+new_line			db 13, 10, '$'
+
 input_radix_prompt	db 'Please enter the input radix in decimal (q to quit): $'
 output_radix_prompt	db 'Please enter the output radix in decimal (q to quit): $'
 change_radix_prompt	db 'Do you want to change either input or output radix? (y/n): $'
@@ -16,6 +18,9 @@ input_to_large		db 'Your input was too large, enter a value (-32768 <= input <= 
 
 input_radix			dw 0
 output_radix		dw 0
+
+current_radix		dw 0
+
 .code
 			extern putdec:near, puthex:near
 main proc
@@ -25,19 +30,17 @@ main proc
 
 			mov		cx, 10
 			call	GetRad
-			call	putdec
 			mov		cx, 16
-			call	GetRad
-			call	PutHex	
-		
+			call	PutRad
 
 			_Exit 0
+
 main endp
 
 GetRad proc
 			
 			xor		bx, bx
-					
+				
 			mov		ah, 08h
 			int		21h
 			
@@ -50,8 +53,10 @@ GetRad proc
 			int		21h
 			
 Get_Input:
+
 			mov		ah, 08h
 			int		21h		
+
 Not_Neg:
 
 			cmp		cx, 10
@@ -109,18 +114,37 @@ Numeric_Radix:
 			sub		al, '0'
 
 Calculate_Value:
+
+			xor		dx, dx
 			xor		ah, ah
 			xchg	ax, bx
 			mul		cx
+			cmp		dx, 0
+			jne		Oversized_Value
 			add		bx, ax
 			jmp		Get_Input
 
 Invalid_Input:
 
+			cmp		al, 8
+			je		Handle_Backspace
 			cmp		al, 13
 			je		End_Get
 			jmp		Get_Input
+
+Handle_Backspace:
 			
+			xor		dx, dx
+			mov		ax, bx
+			div		cx
+			mov		bx, ax
+			_putch 	8
+			_putch 	' '
+			_putch 	8
+			xor		ax, ax
+			xor		dx, dx
+			jmp		Get_Input	
+
 End_Get:
 			
 			cmp		di, 1
@@ -143,14 +167,62 @@ Special_Case:
 			jmp		Done
 
 Oversized_Value:
-
+			
+			_putstr new_line
 			_putstr input_to_large
 			jmp GetRad			 
 
 Done:
 
 			mov		ax, bx
+
 			ret	
+
 GetRad endp
+
+PutRad proc
+
+			;Preconditions: Number to be output in AX, output radix in CX
+
+			mov		di, cx
+			xor		cx, cx
+					
+Process_Number:
+
+			xor		dx, dx
+			div		di	
+			push	dx
+			inc		cx	
+			cmp		ax, 0
+			jne		Process_Number	
+	
+Output_Number:
+		
+			jcxz	Done_Put
+			
+			pop		ax
+			dec		cx	
+			cmp		ax, 10 
+			jb		Numeric_Output
+
+			add		al, 55
+
+			jmp		Print_Number
+			
+Numeric_Output:
+	
+			add		al, '0'
+
+Print_Number:
+
+			_putch al
+
+			jmp		Output_Number	
+			
+Done_Put:	
+
+			ret
+
+PutRad endp
 
 end main
