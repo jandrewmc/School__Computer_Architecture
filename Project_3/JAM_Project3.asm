@@ -21,6 +21,9 @@ output_radix		dw 0
 
 current_radix		dw 0
 
+input				db 'Input: $'
+output				db 'Output: $'
+
 .code
 			extern putdec:near, puthex:near
 main proc
@@ -28,10 +31,31 @@ main proc
 			mov		ax, @data
 			mov		ds, ax
 
+			_putstr input_radix_prompt
 			mov		cx, 10
 			call	GetRad
-			mov		cx, 16
+			mov		[input_radix], ax
+			_putstr	new_line
+
+			_putstr output_radix_prompt
+			mov		cx, 10
+			call	GetRad
+			mov		[output_radix], ax
+			_putstr new_line
+
+Loop_Here:
+
+			_putstr input
+			mov		cx, input_radix
+			call	GetRad
+			sputstr new_line
+
+			sputstr output
+			mov		cx, output_radix
 			call	PutRad
+			_putstr new_line
+
+			jmp		Loop_Here
 
 			_Exit 0
 
@@ -39,7 +63,11 @@ main endp
 
 GetRad proc
 			
+			xor 	ax, ax	
 			xor		bx, bx
+			xor		dx, dx
+			xor		si, si
+			xor		di, di
 				
 			mov		ah, 08h
 			int		21h
@@ -184,8 +212,18 @@ PutRad proc
 
 			;Preconditions: Number to be output in AX, output radix in CX
 
+			xor		bx, bx
+			xor		dx, dx
+			xor		si, si
+			xor		di, di
+
 			mov		di, cx
 			xor		cx, cx
+				
+			test	ah, 10000000b
+			jz		Process_Number
+			sputch  '-'
+			neg		ax	
 					
 Process_Number:
 
