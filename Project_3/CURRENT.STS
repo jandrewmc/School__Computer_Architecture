@@ -5,18 +5,19 @@
 	target="c:\dev\archit~1\projec~4\p.exe"
 	synonym=;C:\DEV\ARCHIT~1\PROJEC~4
 	genericbp='E  "{,JAM_Project3.asm,C:\DEV\ARCHIT~1\PROJEC~4\p.EXE} .34"
+	genericbp='E  "{,JAM_Project3.asm,C:\DEV\ARCHIT~1\PROJEC~4\p.EXE} .61"
 	srcwin=vs1+ /a+b+c+l+s+t+
 [cv]
 	wndstate=0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1
 	wndstate=1 80 9 0 1 0 1 0 0 0 0 0 0 0 -1
 	wndstate=2 34 9 33 1 0 0 0 0 0 0 0 0 0 -1
-	wndstate=3 80 30 0 10 0 1 0 0 0 137 113 0 0 -1
+	wndstate=3 80 30 0 10 1 1 0 0 0 76 55 0 0 -1
 	wndstate=4 67 12 3 13 0 0 0 0 0 0 0 0 0 -1
 	wndstate=5 67 9 0 22 0 0 0 0 0 0 0 0 0 -1
 	wndstate=6 67 9 3 25 0 0 0 0 0 0 0 0 0 -1
-	wndstate=7 13 48 67 1 1 1 0 0 0 0 0 0 0 -1
+	wndstate=7 13 48 67 1 0 1 0 0 0 19 0 0 0 -1
 	wndstate=8 67 9 0 31 0 0 0 0 0 0 0 0 0 -1
-	wndstate=9 80 9 0 40 0 1 0 1 0 3 0 0 0 -1
+	wndstate=9 80 9 0 40 0 1 0 1 0 5 0 0 0 -1
 	command=use auto
 	command=n10
 	screensize=50

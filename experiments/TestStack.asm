@@ -3,12 +3,13 @@
 .stack	100h
 .data
 .code
+	extern putdec:far
 TestStack	proc
 
 			mov		ax, @data
 			mov		ds, ax
 
-			call	NearProc1
+			call putdec		
 			
 			mov		ah, 4ch
 			int		21h
