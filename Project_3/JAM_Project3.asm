@@ -1,3 +1,7 @@
+; J Andrew McCormick
+; Project 3
+; Radix project
+
 include pcmac.inc
 .model small
 .8086
