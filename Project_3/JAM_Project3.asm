@@ -9,7 +9,7 @@ new_line			db 13, 10, '$'
 
 input_radix_prompt	db 'Please enter the input radix in decimal (* to quit): $'
 output_radix_prompt	db 'Please enter the output radix in decimal (* to quit): $'
-change_radix_prompt	db 'Do you want to change either input or output radix? (y/n, * to quit): $'
+change_radix_prompt	db 'Do you want to change either input or output radix? (y/n) (* to quit): $'
 
 number_A_prompt		db 'Enter the number A (* to quit): $'
 number_B_prompt 	db 'Enter the number B (* to quit): $'
@@ -66,13 +66,16 @@ Get_Input_Numbers:
 			call	GetRad
 			mov		num_B, ax
 			_putstr new_line
+			_putstr new_line
 
 			call	Addition
 			call	Subtraction
 			call	Multiplication
 			call	Division
 			call	Exponent
-						
+			
+			_putstr new_line			
+
 Invalid_Selection:
 
 			_putstr change_radix_prompt			;Check to see if the user wants to quit, 
@@ -107,9 +110,9 @@ main endp
 
 Get_Radix_Input	proc
 
-Get_Radix:
-
 			_SvRegs <cx>
+		
+Get_Radix:
 			
 			mov		cx, 10
 			call	GetRad
@@ -149,6 +152,7 @@ Get_Radix_Input	endp
 Output_Result	proc
 
 			_SvRegs <cx>
+
 			mov		cx, output_radix
 				
 			cmp		cx, 10
@@ -195,7 +199,7 @@ Output_Result	endp
 
 ;####################################################################################
 ; Addition: Adds the two numbers together and outputs the result
-; Preconditions: None
+; Preconditions: A + B where A is var num_A and B is num_B
 ; Postconditions: None	
 
 
@@ -220,7 +224,7 @@ Addition endp
 
 ;####################################################################################
 ; Subtraction: Subtracts the two numbers and outputs the result
-; Preconditions: None
+; Preconditions: A - B where A is a variable named num_A and B is num_B
 ; Postconditions: None
 
 
@@ -245,7 +249,7 @@ Subtraction endp
 
 ;###################################################################################
 ; Multiplication: Multiplies the two numbers and outputs the result
-; Preconditions: None
+; Preconditions: A * B where A is var num_A and B is num_B
 ; Postconditions: None
 
 
@@ -256,7 +260,7 @@ Multiplication proc
 			sputstr multiplication_text
 
 			mov		ax, num_A
-			mul		num_B
+			imul	num_B
 
 			call	Output_Result
 
@@ -270,23 +274,47 @@ Multiplication endp
 
 ;###################################################################################
 ; Division: Divides the two numbers and outputs the result.  Handles divide by zero.
-; Preconditions: None
+; Preconditions: A / B where A is var num_A and B is num_B
 ; Postconditions: None
 
 
 Division proc
 		
-			_SvRegs <ax, bx, cx, dx>
+			_SvRegs <ax, bx, cx, dx, di>
+
+			xor		dx, dx
+			xor		di, di
 
 			sputstr division_text 
 			
-			mov		bx, num_B
-			cmp		bx, 0
-			je		Div_Zero
-
-			xor		dx, dx
 			mov		ax, num_A
+			mov		bx, num_B
+
+			cmp		bx, 0				;For some reason idiv was giving
+			je		Div_Zero			;erroneous results.  This is the
+			jg		Check_AX_For_Sign	;work around.
+			
+			inc		di					;track negatives in di
+			neg		bx
+
+Check_AX_For_Sign:
+
+			cmp		ax, 0
+			jg		Divide_vals	
+			
+			inc		di
+			neg		ax	
+
+Divide_vals:
+
 			div		bx	
+
+			cmp		di, 1				;if only 1 negative, result is 
+			jne		div_output			;negative, otherwise, positive.
+
+			neg		ax
+			
+div_output:
 
 			mov		cx, output_radix
 			cmp		cx, 10
@@ -310,9 +338,10 @@ Division proc
 			call	PutRad
 			sputch  ';'
 			sputch  ' '
-			jmp		div_dec
 
 			pop		ax
+
+			jmp		div_dec
 
 div_hex:
 			
@@ -321,7 +350,8 @@ div_hex:
 			sputch  ' '
 
 div_dec:
-
+		
+			mov		cx, 10
 			call	PutRad
 			sputstr quotient
 			xchg	ax, dx
@@ -340,7 +370,7 @@ div_zero:
 
 done_div:
 
-			_RsRegs <dx, cx, bx, ax>
+			_RsRegs <di, dx, cx, bx, ax>
 
 			ret
 
@@ -363,12 +393,17 @@ Exponent proc
 			mov		ax, 1
 			mov		bx, num_A
 			mov		cx, num_B
-						
+			
+			cmp		cx, 0
+			jge		Exponent_Loop
+
+			neg		cx
+							
 Exponent_Loop:
 
 			jcxz	Exponent_Done	
 			 
-			mul		bx
+			imul	bx
 			dec		cx
 
 			jmp		Exponent_Loop
@@ -394,6 +429,12 @@ Exponent endp
 GetRad proc
 			
 			_SvRegs <bx, cx, dx, si, di>
+
+Start_Get_Over:	
+
+			xor		bx, bx			
+			xor		di, di
+			xor		si, si
 				
 			mov		ah, 08h
 			int		21h
@@ -402,21 +443,25 @@ GetRad proc
 			jne 	Start_GetRad
 
 			_Exit 0
-			
-Start_GetRad:
-						
-			cmp		al, '-'
-			jne		Not_Neg
-			mov		di, 1
-	
-			mov		dl, al
-			mov		ah, 02h
-			int		21h
-			
+
 Get_Input:
 
 			mov		ah, 08h
 			int		21h		
+
+Start_GetRad:
+
+			cmp		si, 0
+			jne		Not_Neg
+				
+			cmp		al, '-'
+			jne		Not_Neg
+			mov		di, 1
+			inc		si	
+			mov		dl, al
+			mov		ah, 02h
+			int		21h
+			jmp		Get_Input	
 
 Not_Neg:
 
@@ -483,6 +528,7 @@ Calculate_Value:
 			cmp		dx, 0
 			jne		Oversized_Value
 			add		bx, ax
+			inc  	si
 			jmp		Get_Input
 
 Invalid_Input:
@@ -495,6 +541,11 @@ Invalid_Input:
 
 Handle_Backspace:
 			
+			cmp		si, 0
+			je		Get_Input	
+
+			dec		si
+				
 			xor		dx, dx
 			mov		ax, bx
 			div		cx
@@ -514,26 +565,26 @@ End_Get:
 			ja		Oversized_Value
 			je		Special_Case
 			neg		bx
-			jmp		Done
+			jmp		Done_Get
 
 Size_Var:
 
 			cmp		bx, 32767
 			ja		Oversized_Value
-			jmp		Done
+			jmp		Done_Get
 	
 Special_Case:
 
 			mov		bx, 32768
-			jmp		Done
+			jmp		Done_Get
 
 Oversized_Value:
 			
 			sputstr new_line
 			sputstr input_to_large
-			jmp GetRad			 
+			jmp		Start_Get_Over 			 
 
-Done:
+Done_Get:
 
 			mov		ax, bx
 
@@ -543,21 +594,21 @@ Done:
 
 GetRad endp
 
-PutRad proc
 
-			;Preconditions: Number to be output in AX, output radix in CX
+
+;#############################################################################################
+; PutRad: Outputs a number to the console in the specified radix
+; Preconditions: Number to output in AX, output radix in CX
+; Postconditions: None.
+
+PutRad proc
 
 			_SvRegs <ax, bx, cx, dx, si, di>
 	
-			xor		bx, bx
-			xor		dx, dx
-			xor		si, si
-			xor		di, di
-
 			mov		di, cx
 			xor		cx, cx
 				
-			test	ah, 10000000b
+			test	ah, 10000000b				;check for sign
 			jz		Process_Number
 			sputch  '-'
 			neg		ax	
@@ -577,10 +628,10 @@ Output_Number:
 			
 			pop		ax
 			dec		cx	
-			cmp		ax, 10 
+			cmp		ax, 10 			
 			jb		Numeric_Output
 
-			add		al, 55
+			add		al, 55					;Convert number to letter
 
 			jmp		Print_Number
 			
@@ -590,7 +641,7 @@ Numeric_Output:
 
 Print_Number:
 
-			_putch al
+			sputch 	al
 
 			jmp		Output_Number	
 			
