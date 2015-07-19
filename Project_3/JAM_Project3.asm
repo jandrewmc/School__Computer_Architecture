@@ -16,12 +16,12 @@ number_B_prompt 	db 'Enter the number B (* to quit): $'
 
 input_to_large		db 'Your input was too large, enter a value (-32768 <= input <= 32767 decimal): $'
 invalid_radix		db 'You entered an invalid radix, please enter a value between 2 and 36: $'
-decimal				db ' decimal$'
-hex					db ' hex$'
-base				db ' base $'
+decimal			db ' decimal$'
+hex			db ' hex$'
+base			db ' base $'
 
-quotient			db ' quotient, $'
-remainder			db ' remainder$'
+quotient		db ' quotient, $'
+remainder		db ' remainder$'
 divide_by_zero		db 'Cannot Divide by Zero', 13, 10, '$'
 
 addition_text		db 'A + B = $'
@@ -30,41 +30,41 @@ multiplication_text db 'A * B = $'
 division_text		db 'A / B = $'
 exponent_text		db 'A ^ B = $'
 
-input_radix			dw 0
+input_radix		dw 0
 output_radix		dw 0
 
-num_A				dw 0
-num_B				dw 0
+num_A			dw 0
+num_B			dw 0
 
 .code
 
 main proc
 
-			mov		ax, @data
-			mov		ds, ax
+			mov	ax, @data
+			mov	ds, ax
 
 Get_Radix_Again:
 
 			_putstr input_radix_prompt			;Get Input Radix
 			call	Get_Radix_Input
-			mov		input_radix, ax
+			mov	input_radix, ax
 
 			_putstr output_radix_prompt			;Get Output Radix
 			call	Get_Radix_Input
-			mov		output_radix, ax
+			mov	output_radix, ax
 
 Get_Input_Numbers:
 
 			_putstr number_A_prompt 			;Get First Number
-			mov		cx, input_radix
+			mov	cx, input_radix
 			call	GetRad
-			mov		num_A, ax
+			mov	num_A, ax
 			sputstr new_line
 
 			_putstr number_B_prompt				;Get Second Number
-			mov		cx, input_radix
+			mov	cx, input_radix
 			call	GetRad
-			mov		num_B, ax
+			mov	num_B, ax
 			_putstr new_line
 			_putstr new_line
 
@@ -81,19 +81,19 @@ Invalid_Selection:
 			_putstr change_radix_prompt			;Check to see if the user wants to quit, 
 			_getch								;enter a new input and output radix,
 												;or just new input numbers
-			cmp		al, '*'
-			je		Done
+			cmp	al, '*'
+			je	Done
 			
 			sputstr new_line
 
-			and		al, 11011111b
-			cmp		al, 'Y'
-			je		Get_Radix_Again
-			cmp		al, 'N'
-			je		Get_Input_Numbers
+			and	al, 11011111b
+			cmp	al, 'Y'
+			je	Get_Radix_Again
+			cmp	al, 'N'
+			je	Get_Input_Numbers
 			
 			_putstr new_line
-			jmp		Invalid_Selection
+			jmp	Invalid_Selection
 Done:
 
 			_Exit 0
@@ -114,24 +114,24 @@ Get_Radix_Input	proc
 		
 Get_Radix:
 			
-			mov		cx, 10
+			mov	cx, 10
 			call	GetRad
 
-			cmp		ax, 2
-			jb		Invalid_Radix_Input
-			cmp		ax, 36
-			ja		Invalid_Radix_Input
+			cmp	ax, 2
+			jb	Invalid_Radix_Input
+			cmp	ax, 36
+			ja	Invalid_Radix_Input
 
 			sputstr	new_line
 			
-			jmp		Done_Radix
+			jmp	Done_Radix
 
 Invalid_Radix_Input:
 	
 			sputstr new_line
 			sputstr invalid_radix
 			
-			jmp		Get_Radix	
+			jmp	Get_Radix	
 
 Done_Radix:
 
@@ -153,28 +153,28 @@ Output_Result	proc
 
 			_SvRegs <cx>
 
-			mov		cx, output_radix
+			mov	cx, output_radix
 				
-			cmp		cx, 10
-			je		out_dec
+			cmp	cx, 10
+			je	out_dec
 
 			call	PutRad
 
-			cmp		cx, 16
-			je		out_hex
+			cmp	cx, 16
+			je	out_hex
 
 			push	ax
 
 			sputstr base
-			mov		ax, cx
-			mov		cx, 10 
+			mov	ax, cx
+			mov	cx, 10 
 			call	PutRad
 			sputch  ','
 			sputch  ' '
 
-			pop		ax
+			pop	ax
 			
-			jmp		out_dec
+			jmp	out_dec
 
 out_hex:
 
@@ -184,7 +184,7 @@ out_hex:
 
 out_dec:
 
-			mov		cx, 10				
+			mov	cx, 10				
 			call	PutRad	
 			sputstr	decimal
 			sputstr	new_line
@@ -209,8 +209,8 @@ Addition proc
 
 			sputstr addition_text
 				
-			mov		ax, num_A
-			add		ax, num_B
+			mov	ax, num_A
+			add	ax, num_B
 
 			call	Output_Result
 
@@ -234,8 +234,8 @@ Subtraction proc
 			
 			sputstr subtraction_text
 
-			mov		ax, num_A
-			sub		ax, num_B
+			mov	ax, num_A
+			sub	ax, num_B
 
 			call	Output_Result
 
@@ -259,7 +259,7 @@ Multiplication proc
 
 			sputstr multiplication_text
 
-			mov		ax, num_A
+			mov	ax, num_A
 			imul	num_B
 
 			call	Output_Result
@@ -282,43 +282,43 @@ Division proc
 		
 			_SvRegs <ax, bx, cx, dx, di>
 
-			xor		dx, dx
-			xor		di, di
+			xor	dx, dx
+			xor	di, di
 
 			sputstr division_text 
 			
-			mov		ax, num_A
-			mov		bx, num_B
+			mov	ax, num_A
+			mov	bx, num_B
 
-			cmp		bx, 0				;For some reason idiv was giving
-			je		Div_Zero			;erroneous results.  This is the
-			jg		Check_AX_For_Sign	;work around.
+			cmp	bx, 0				;For some reason idiv was giving
+			je	Div_Zero			;erroneous results.  This is the
+			jg	Check_AX_For_Sign	;work around.
 			
-			inc		di					;track negatives in di
-			neg		bx
+			inc	di					;track negatives in di
+			neg	bx
 
 Check_AX_For_Sign:
 
-			cmp		ax, 0
-			jg		Divide_vals	
+			cmp	ax, 0
+			jg	Divide_vals	
 			
-			inc		di
-			neg		ax	
+			inc	di
+			neg	ax	
 
 Divide_vals:
 
-			div		bx	
+			div	bx	
 
-			cmp		di, 1				;if only 1 negative, result is 
-			jne		div_output			;negative, otherwise, positive.
+			cmp	di, 1				;if only 1 negative, result is 
+			jne	div_output			;negative, otherwise, positive.
 
-			neg		ax
+			neg	ax
 			
 div_output:
 
-			mov		cx, output_radix
-			cmp		cx, 10
-			je		div_dec
+			mov	cx, output_radix
+			cmp	cx, 10
+			je	div_dec
 
 			call	PutRad
 			sputstr quotient
@@ -327,21 +327,21 @@ div_output:
 			sputstr remainder
 			xchg	ax, dx
 
-			cmp		cx, 16
-			je		div_hex
+			cmp	cx, 16
+			je	div_hex
 			
 			push	ax
 
 			sputstr base
-			mov		ax, cx
-			mov		cx, 10
+			mov	ax, cx
+			mov	cx, 10
 			call	PutRad
 			sputch  ';'
 			sputch  ' '
 
-			pop		ax
+			pop	ax
 
-			jmp		div_dec
+			jmp	div_dec
 
 div_hex:
 			
@@ -351,7 +351,7 @@ div_hex:
 
 div_dec:
 		
-			mov		cx, 10
+			mov	cx, 10
 			call	PutRad
 			sputstr quotient
 			xchg	ax, dx
@@ -362,7 +362,7 @@ div_dec:
 			sputstr decimal
 			sputstr new_line
 
-			jmp		done_div
+			jmp	done_div
 
 div_zero:
 			
@@ -390,23 +390,23 @@ Exponent proc
 			
 			sputstr exponent_text
 
-			mov		ax, 1
-			mov		bx, num_A
-			mov		cx, num_B
+			mov	ax, 1
+			mov	bx, num_A
+			mov	cx, num_B
 			
-			cmp		cx, 0
-			jge		Exponent_Loop
+			cmp	cx, 0
+			jge	Exponent_Loop
 
-			neg		cx
+			neg	cx
 							
 Exponent_Loop:
 
 			jcxz	Exponent_Done	
 			 
 			imul	bx
-			dec		cx
+			dec	cx
 
-			jmp		Exponent_Loop
+			jmp	Exponent_Loop
 
 Exponent_Done:
 
@@ -432,161 +432,161 @@ GetRad proc
 
 Start_Get_Over:	
 
-			xor		bx, bx			
-			xor		di, di
-			xor		si, si
+			xor	bx, bx			
+			xor	di, di
+			xor	si, si
 				
-			mov		ah, 08h
-			int		21h
+			mov	ah, 08h
+			int	21h
 			
-			cmp		al, '*'
+			cmp	al, '*'
 			jne 	Start_GetRad
 
 			_Exit 0
 
 Get_Input:
 
-			mov		ah, 08h
-			int		21h		
+			mov	ah, 08h
+			int	21h		
 
 Start_GetRad:
 
-			cmp		si, 0
-			jne		Not_Neg
+			cmp	si, 0
+			jne	Not_Neg
 				
-			cmp		al, '-'
-			jne		Not_Neg
-			mov		di, 1
-			inc		si	
-			mov		dl, al
-			mov		ah, 02h
-			int		21h
-			jmp		Get_Input	
+			cmp	al, '-'
+			jne	Not_Neg
+			mov	di, 1
+			inc	si	
+			mov	dl, al
+			mov	ah, 02h
+			int	21h
+			jmp	Get_Input	
 
 Not_Neg:
 
-			cmp		cx, 10
-			jle		Numeric_Radix
+			cmp	cx, 10
+			jle	Numeric_Radix
 
 Alpha_Numeric_Radix:
 
-			cmp		al, '0'
-			jb		Invalid_Input
-			cmp		al, '9'
-			ja		Check_Letters
+			cmp	al, '0'
+			jb	Invalid_Input
+			cmp	al, '9'
+			ja	Check_Letters
 			
-			mov		dl, al
-			mov		ah, 02h
-			int		21h
+			mov	dl, al
+			mov	ah, 02h
+			int	21h
 
-			sub		al, '0'
+			sub	al, '0'
 			
-			jmp		Calculate_Value
+			jmp	Calculate_Value
 				
 Check_Letters:
 
-			mov		dx, cx	
-			add		dx, 54
+			mov	dx, cx	
+			add	dx, 54
 
-			cmp		al, 'A'
-			jb		Invalid_Input
-			and		al, 11011111b
-			cmp		al, dl
-			ja		Invalid_Input
+			cmp	al, 'A'
+			jb	Invalid_Input
+			and	al, 11011111b
+			cmp	al, dl
+			ja	Invalid_Input
 
-			mov		dl, al
-			mov		ah, 02h
-			int		21h
+			mov	dl, al
+			mov	ah, 02h
+			int	21h
 
-			sub		al, 55
+			sub	al, 55
 
-			jmp		Calculate_Value
+			jmp	Calculate_Value
 
 Numeric_Radix:
 	
-			mov		dx, cx
-			add		dx,	'0'
-			dec		dx 
+			mov	dx, cx
+			add	dx,	'0'
+			dec	dx 
 			
-			cmp		al, '0'
-			jb		Invalid_Input
-			cmp		al, dl
-			ja		Invalid_Input
+			cmp	al, '0'
+			jb	Invalid_Input
+			cmp	al, dl
+			ja	Invalid_Input
 			
-			mov		dl, al	
-			mov		ah, 02h
-			int		21h
+			mov	dl, al	
+			mov	ah, 02h
+			int	21h
 
-			sub		al, '0'
+			sub	al, '0'
 
 Calculate_Value:
 
-			xor		dx, dx
-			xor		ah, ah
+			xor	dx, dx
+			xor	ah, ah
 			xchg	ax, bx
-			mul		cx
-			cmp		dx, 0
-			jne		Oversized_Value
-			add		bx, ax
+			mul	cx
+			cmp	dx, 0
+			jne	Oversized_Value
+			add	bx, ax
 			inc  	si
-			jmp		Get_Input
+			jmp	Get_Input
 
 Invalid_Input:
 
-			cmp		al, 8
-			je		Handle_Backspace
-			cmp		al, 13
-			je		End_Get
-			jmp		Get_Input
+			cmp	al, 8
+			je	Handle_Backspace
+			cmp	al, 13
+			je	End_Get
+			jmp	Get_Input
 
 Handle_Backspace:
 			
-			cmp		si, 0
-			je		Get_Input	
+			cmp	si, 0
+			je	Get_Input	
 
-			dec		si
+			dec	si
 				
-			xor		dx, dx
-			mov		ax, bx
-			div		cx
-			mov		bx, ax
+			xor	dx, dx
+			mov	ax, bx
+			div	cx
+			mov	bx, ax
 			sputch 	8
 			sputch 	' '
 			sputch 	8
-			xor		ax, ax
-			xor		dx, dx
-			jmp		Get_Input	
+			xor	ax, ax
+			xor	dx, dx
+			jmp	Get_Input	
 
 End_Get:
 			
-			cmp		di, 1
-			jne		Size_Var
-			cmp		bx, 32768
-			ja		Oversized_Value
-			je		Special_Case
-			neg		bx
-			jmp		Done_Get
+			cmp	di, 1
+			jne	Size_Var
+			cmp	bx, 32768
+			ja	Oversized_Value
+			je	Special_Case
+			neg	bx
+			jmp	Done_Get
 
 Size_Var:
 
-			cmp		bx, 32767
-			ja		Oversized_Value
-			jmp		Done_Get
+			cmp	bx, 32767
+			ja	Oversized_Value
+			jmp	Done_Get
 	
 Special_Case:
 
-			mov		bx, 32768
-			jmp		Done_Get
+			mov	bx, 32768
+			jmp	Done_Get
 
 Oversized_Value:
 			
 			sputstr new_line
 			sputstr input_to_large
-			jmp		Start_Get_Over 			 
+			jmp	Start_Get_Over 			 
 
 Done_Get:
 
-			mov		ax, bx
+			mov	ax, bx
 
 			_RsRegs <di, si, dx, cx, bx>
 
@@ -605,45 +605,45 @@ PutRad proc
 
 			_SvRegs <ax, bx, cx, dx, si, di>
 	
-			mov		di, cx
-			xor		cx, cx
+			mov	di, cx
+			xor	cx, cx
 				
 			test	ah, 10000000b				;check for sign
-			jz		Process_Number
+			jz	Process_Number
 			sputch  '-'
-			neg		ax	
+			neg	ax	
 					
 Process_Number:
 
-			xor		dx, dx
-			div		di	
+			xor	dx, dx
+			div	di	
 			push	dx
-			inc		cx	
-			cmp		ax, 0
-			jne		Process_Number	
+			inc	cx	
+			cmp	ax, 0
+			jne	Process_Number	
 	
 Output_Number:
 		
 			jcxz	Done_Put
 			
-			pop		ax
-			dec		cx	
-			cmp		ax, 10 			
-			jb		Numeric_Output
+			pop	ax
+			dec	cx	
+			cmp	ax, 10 			
+			jb	Numeric_Output
 
-			add		al, 55					;Convert number to letter
+			add	al, 55					;Convert number to letter
 
-			jmp		Print_Number
+			jmp	Print_Number
 			
 Numeric_Output:
 	
-			add		al, '0'
+			add	al, '0'
 
 Print_Number:
 
 			sputch 	al
 
-			jmp		Output_Number	
+			jmp	Output_Number	
 			
 Done_Put:	
 			
